@@ -1,6 +1,6 @@
-# afk
+# Knowledge Master
 
-> AFK Master
+> Knowledge Master
 
 ## Build Setup
 
