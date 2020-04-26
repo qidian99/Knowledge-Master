@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import App from './App'
+import WXrequest from './utils/request'
 
 Vue.config.productionTip = false
+Vue.prototype.$http = WXrequest
 
 // 接着，这个App.vue组件被src/main.js引入并被设置了一个mpType的属性值，其值为app。
 //  这个值是为了与后面要讲的小程序页面组件所区分开来，因为小程序页面组件和这个App.vue组件的写法和引入方式是一致的，

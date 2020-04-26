@@ -3,6 +3,7 @@
     <div class="counter-num">次数：{{num}}</div>
     <button class="counter-btn" @click="handleClick">点我呀！</button>
     <button class="counter-reset-btn" @click="handleResetClick">清零</button>
+    <slot></slot>
   </div>
 </template>
 

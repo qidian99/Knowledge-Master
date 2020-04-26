@@ -2,13 +2,16 @@
   <div class="container" @click="clickHandle">
     <div class="message">{{msg}}</div>
     <ClickCounter :init-num='10' @clicknum="handleClickNum" />
+    <UserStatus />
+    <!-- <ClickCounter :init-num='30' @clicknum="handleClickNum" /> -->
   </div>
 </template>
 
 <script>
 import ClickCounter from '@/components/click-counter'
+import UserStatus from '@/components/user-status'
 export default {
-  components: { ClickCounter },
+  components: { ClickCounter, UserStatus },
   data () {
     return {
       msg: 'Hello'

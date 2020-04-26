@@ -1,8 +1,8 @@
 {
-  "name": "Knowledge Master",
+  "name": "km",
   "version": "1.0.0",
   "mpvueTemplateProjectVersion": "0.1.0",
-  "description": "AFK Master",
+  "description": "Knowledge Master",
   "author": "qidian <qidian990107@163.com>",
   "private": true,
   "scripts": {
