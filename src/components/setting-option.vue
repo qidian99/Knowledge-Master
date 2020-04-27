@@ -8,7 +8,7 @@
       {{ text }}
     </div>
     <div v-if="navigation">
-      <!-- <a-icon type="right" /> -->
+      <img style="width:45rpx; height:45rpx;" src="/static/icons/right.svg"/>
     </div>
   </div>
 </template>
@@ -38,9 +38,13 @@ export default {
   },
   computed: {
     containerStyle() {
+      if (this.navigation) {
+        return 'padding: 10px 5px'
+      }
+
       if (!this.src) {
         return 'padding: 15px 20px'
-      }
+      } 
       // return 'background-color: ' + grey.primary;
     }
   },
@@ -56,16 +60,7 @@ export default {
   padding: 10px 20px;
   /* height: 50px; */
   border-radius: 5px;
-  background-color: white;
-}
-
-.setting-option-container {
-  display: flex;
-  flex-direction: row;
-  padding: 10px 20px;
-  /* height: 50px; */
-  border-radius: 5px;
-  background-color: white;
+  /* background-color: white; */
 }
 
 .setting-option-title {

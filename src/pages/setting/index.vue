@@ -4,7 +4,7 @@
     <div class="setting-option-divider" />
     <SettingOption v-if="user" :text="user.nickName" title="名字"/>
     <div class="setting-option-divider" />
-    <navigator url="/pages/topics/main" hover-class="navigator-hover">
+    <navigator class="b-nav" url="/pages/topics/main" hover-class="navigator-hover">
       <SettingOption navigation="topics" title="选择话题"/>
     </navigator>
     <WXAuthorize @clickAuthorize="handleClick" />
@@ -71,5 +71,27 @@ export default {
   margin-left: 5%;
   width: 90%;
 }
+
+
+
+.b-nav {
+  margin: 10px 15px 10px 15px;
+  /* position: relative; */
+  /* -webkit-box-align: center;
+  -webkit-align-items: center; */
+  align-items: center;
+}
+/* .b-nav:before {
+  content: " ";
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 1px;
+  border-top: 1rpx solid #d9d9d9;
+  color: #d9d9d9;
+  left: 15px;
+} */
+
 
 </style>

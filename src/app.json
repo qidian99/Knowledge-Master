@@ -2,7 +2,8 @@
   "pages": [
     "pages/index/main",
     "pages/setting/main",
-    "pages/topics/main"
+    "pages/topics/main",
+    "pages/demo/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
