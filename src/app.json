@@ -23,8 +23,8 @@
     }, {
       "text": "设置",
       "pagePath": "pages/setting/main",
-      "iconPath": "static/tabs/home.png",
-      "selectedIconPath": "static/tabs/home-active.png"
+      "iconPath": "static/tabs/setting.png",
+      "selectedIconPath": "static/tabs/setting-active.png"
     }],
     "position": "bottom"
   }
