@@ -1,46 +1,46 @@
 <template>
-  <button open-type="getUserInfo" @getuserinfo="bindGetUserInfo" @click="getUserInfoClick">获取权限</button>
+  <div class="b-user-status">
+    <button open-type="getUserInfo" @getuserinfo="bindGetUserInfo" @click="getUserInfoClick">同步个人信息</button>
+  </div>
 </template>
 
 <script>
-import { registerQuery } from '../utils/queries'
-
 export default {
   data() {
     return {
     }
   },
-  mounted() {
-    self = this
-    wx.login({
-      async success(res) {
-        console.log('WXAuthorize Mounted', res)
-        if (res.code) {
-          // 这里可以把code传给后台，后台用此获取openid及session_key
-          console.log('Code', res.code)
-          const payload = {
-            query: registerQuery,
-            variables: {
-              code: res.code
-            }
-          }
-          const r = await self.$http.post({
-            payload
-          })
+  // mounted() {
+  //   self = this
+  //   wx.login({
+  //     async success(res) {
+  //       console.log('WXAuthorize Mounted', res)
+  //       if (res.code) {
+  //         // 这里可以把code传给后台，后台用此获取openid及session_key
+  //         console.log('Code', res.code)
+  //         const payload = {
+  //           query: registerQuery,
+  //           variables: {
+  //             code: res.code
+  //           }
+  //         }
+  //         const r = await self.$http.post({
+  //           payload
+  //         })
           
-          const {
-            data: {
-              registerOpenid: user
-            }
-          } = r
+  //         const {
+  //           data: {
+  //             registerOpenid: user
+  //           }
+  //         } = r
 
-          console.log('Registered code:', r)
+  //         console.log('Registered code:', r)
 
-          // self.notifyUserInfo(user)
-        }
-      }
-    })
-  },
+  //         // self.notifyUserInfo(user)
+  //       }
+  //     }
+  //   })
+  // },
   methods: {
     getUserInfoClick() {
       // console.log('click事件首先触发')
@@ -83,15 +83,16 @@ export default {
 }
 </script>
 
-<style>
-.user-status-container {
-  display: flex;
+<style scoped>
+.b-user-status {
+  margin: 10px, 10px, 0px;
+  padding: 5px 10px;
+  /* display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   border: 1px solid rgb(38, 90, 233);
-  background-color: #ffffff;
-  padding: 5px 10px;
+  background-color: #ffffff; */
 }
 .user-status-user {
   color: black;

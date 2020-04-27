@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@ant-design/colors": "^4.0.0",
+    "@ant-design/icons-vue": "^4.0.4",
     "ant-design-vue": "^1.5.3",
     "antd": "^4.1.5",
     "mpvue": "^2.0.0",

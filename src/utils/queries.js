@@ -23,3 +23,10 @@ export const testQuery = `query test {
   }
 }`
 
+export const topicsQuery = `query topics {
+  topics {
+    topicId
+    name
+  }
+}`
+

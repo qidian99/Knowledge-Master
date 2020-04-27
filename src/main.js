@@ -3,7 +3,12 @@ import Vue from 'vue'
 // import 'ant-design-vue/dist/antd.css'
 // import { Button, message } from 'ant-design-vue';
 import 'mpvue-weui/src/style/weui.css'
+// import { Button, message } from 'ant-design-vue/lib';
+
 // import '~antd/es/style/color/colors.less'
+// import icons from '@ant-design/icons-vue';
+
+// console.log(icons)
 
 import App from './App'
 import WXrequest from './utils/request'
@@ -12,6 +17,8 @@ import store from './store'
 Vue.config.productionTip = false
 Vue.prototype.$http = WXrequest
 Vue.prototype.$store = store
+// Vue.use(icons)
+// Vue.component(Filter.name, Filter);
 
 // Vue.use(Button);
 // Vue.prototype.$message = message;
