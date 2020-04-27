@@ -1,18 +1,19 @@
 <template>
   <div class="user-status-container">
     <div class="user-status-user">用户：{{user}}</div>
-    <div class="user-status-message">信息: {{message}}</div>
+    <div class="user-status-message">信息：{{message}}</div>
     <button class="user-status-btn" @click="getStatus">重新加载</button>
     <slot></slot>
   </div>
 </template>
 
 <script>
+import { testQuery } from '../utils/queries'
 export default {
   data () {
     return {
       user: '',
-      status: ''
+      message: ''
     }
   },
   created: async function () {
@@ -20,13 +21,7 @@ export default {
     this.getStatus()
   },
   methods: {
-    getStatus: function () {
-      const testQuery = `query test {
-    testUser {
-      data
-      message
-    }
-  }`
+    getStatus: async function () {
       // const headers = {
       //   'Content-Type': 'application/json',
       //   'Accept': 'application/json'
@@ -37,17 +32,23 @@ export default {
       }
       console.log('Sending request to', baseURL)
 
-      console.log('POST', this.$http.post)
-
-      this.$http.post({
-        // url: baseURL,
-        data: payload
-      }).then(function (res) {
-        console.log('Res:', res)
-        return res.json()
-      }).then(function (data) {
-        console.log('User status:', data)
+      const res = await this.$http.post({
+        payload
       })
+
+      console.log('User status:', res)
+
+      const {
+        data: {
+          testUser: {
+            data,
+            message
+          }
+        }
+      } = res
+
+      this.user = data.user
+      this.message = message
     }
   }
 }
@@ -56,6 +57,7 @@ export default {
 <style>
 .user-status-container {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   border: 1px solid rgb(38, 90, 233);
