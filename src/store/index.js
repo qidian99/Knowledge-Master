@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import setting from './modules/setting'
+import topics from './modules/topics'
+import auth from './modules/auth'
 import createLogger from '../plugins/logger'
 import createPersistedState from 'vuex-persistedstate'
 
@@ -10,7 +12,9 @@ const debug = process.env.NODE_ENV !== 'production'
 
 export default new Vuex.Store({
   modules: {
-    setting
+    setting,
+    topics,
+    auth
   },
   strict: debug,
   // plugins: debug ? [createLogger()] : []
@@ -19,8 +23,8 @@ export default new Vuex.Store({
       storage: {
         getItem: key => wx.getStorageSync(key),
         setItem: (key, value) => wx.setStorageSync(key, value),
-        removeItem: key => wx.clearStorage()
-        // removeItem: (key) => {}
+        // removeItem: key => wx.clearStorage()
+        removeItem: (key) => {}
       }
     })
   ]

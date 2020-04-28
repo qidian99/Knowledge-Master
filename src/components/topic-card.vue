@@ -1,6 +1,6 @@
 <template>
-  <div class="b-topic-card" @click="handleClick">
-    {{topic}}
+  <div @touchstart="hover = true" @touchend="hover = false" class="b-topic-card" :class="{ active: hover }" @click="handleClick">
+    {{topic.name}}
   </div>
 </template>
 
@@ -10,14 +10,22 @@ console.log("grey", presetPrimaryColors);
 export default {
   props: {
     topic: {
-      type: String,
-      default: 'N/A'
+      type: Object,
+      default: null
     },
   },
   computed: {
   },
-  data() {},
+  data() {
+    return {
+      hover: false,
+    };
+  },
   methods: {
+    mouseDowning: function () {
+      console.log("Mouse moving");
+      this.hover = true;
+    },
     handleClick: function () {
       this.notifiyTopic()
     },
@@ -38,7 +46,16 @@ export default {
   flex: 1;
   align-items: center;
   justify-content: center;
-  /* border-radius: 5px;
-  background-color: white; */
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 15);
+  padding: 20px;
+  font-size: 24;
+  text-align: center;
+  border-radius: 5px;
+  margin: 10px;
+}
+
+.b-topic-card.active {
+  background-color: rgba(0, 0, 0, 0.25);
 }
 </style>

@@ -81,6 +81,7 @@ export default {
 
 .setting-option-value.w--text {
   padding-right: 5px;
+  padding-bottom: 5px;
 }
 
 .setting-option-avatar {

@@ -1,18 +1,13 @@
 export const registerQuery = `
 mutation registerOpenid($code: String!) {
   registerOpenid(code: $code) {
-    userId
-    username
-    password
-    sessionKey
-    openid
-    avatarUrl
-    language
-    nickName
-    gender
-    country
-    city
-    province
+    user {
+      userId
+      username
+      sessionKey
+      openid
+    }
+    token
   }
 }`
 

@@ -1,10 +1,9 @@
 <template>
   <div class="container" @click="clickHandle">
-    <div class="message">{{msg}}</div>
+    <!-- <div class="message">{{msg}}</div>
     <ClickCounter :init-num='10' @clicknum="handleClickNum" />
-    <UserStatus />
-    <!-- <WXAuthorize /> -->
-    <!-- <ClickCounter :init-num='30' @clicknum="handleClickNum" /> -->
+    <UserStatus /> -->
+    <div v-if="topic">你正在浏览{{topic.name}}话题</div>
   </div>
 </template>
 
@@ -13,6 +12,8 @@ import ClickCounter from '@/components/click-counter'
 import UserStatus from '@/components/user-status'
 import WXAuthorize from '@/components/wx-authorize'
 import { registerQuery } from '@/utils/queries'
+import { mapGetters, mapState, mapMutations, mapActions } from "vuex";
+import { SET_AUTH_TOKEN } from '../../store/mutation-types'
 
 export default {
   components: { ClickCounter, UserStatus, WXAuthorize },
@@ -41,18 +42,28 @@ export default {
           
           const {
             data: {
-              registerOpenid: user
+              registerOpenid: {
+                user,
+                token
+              }
             }
           } = r
 
-          console.log('Registered code:', r)
+          console.log('Registered, token is:', token)
 
-          // self.notifyUserInfo(user)
+          // set auth token
+          self[`auth/${SET_AUTH_TOKEN}`](token)
         }
       }
     })
   },
+  computed: {
+    ...mapGetters("topics", {
+      topic: "topic"
+    }),
+  },
   methods: {
+    ...mapMutations([`auth/${SET_AUTH_TOKEN}`]),
     clickHandle () {
       this.msg = 'Clicked!!!!!!'
     },

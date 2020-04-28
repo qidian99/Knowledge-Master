@@ -5,7 +5,7 @@
     <SettingOption v-if="user" :text="user.nickName" title="名字"/>
     <div class="setting-option-divider" />
     <navigator class="b-nav" url="/pages/topics/main" hover-class="navigator-hover">
-      <SettingOption navigation="topics" title="选择话题"/>
+      <SettingOption navigation="topics" title="选择话题" :text="topic.name"/>
     </navigator>
     <WXAuthorize @clickAuthorize="handleClick" />
 
@@ -36,15 +36,18 @@ export default {
     ...mapGetters("setting", {
       userInfo: "userInfo"
     }),
+    ...mapGetters("topics", {
+      topic: "topic"
+    }),
     profileKeys: function () {
       return Object.keys(this.user || {})
     },
   },
   methods: {
-    ...mapMutations([`setting/UPDATE_USER_INFO`]),
+    ...mapMutations([`setting/${UPDATE_USER_INFO}`]),
     handleClick({ user }) {
       console.log("GOT USER FROM AUTHORIZE", user);
-      this[`setting/UPDATE_USER_INFO`](user);
+      this[`setting/${UPDATE_USER_INFO}`](user);
       console.log(this.user);
     }
   }
