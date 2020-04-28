@@ -10,10 +10,12 @@
 import TopicCard from '@/components/topic-card'
 import { topicsQuery } from '../../utils/queries'
 import { blue } from '@ant-design/colors'
-import { mapGetters, mapState, mapMutations } from "vuex";
-import { SET_USER_TOPIC } from "../../store/mutation-types";
-
-console.log(blue)
+import { mapGetters, mapState, mapMutations } from "vuex"
+import { SET_USER_TOPIC, SET_USER_POST } from "../../store/mutation-types"
+import { fetchPosts } from '../../utils/post'
+import {
+  postsQueryWithTopic
+} from "../../utils/queries";
 
 export default {
   components: { TopicCard },
@@ -61,10 +63,13 @@ export default {
     }),
   },
   methods: {
-    ...mapMutations([`topics/${SET_USER_TOPIC}`]),
-    handleClickTopic (data) {
+    ...mapMutations([`topics/${SET_USER_TOPIC}`, `posts/${SET_USER_POST}`]),
+    async handleClickTopic (data) {
+      const self = this
       console.log('>>>>', data, `topics/${SET_USER_TOPIC}`)
-      this[`topics/${SET_USER_TOPIC}`](data.topic)
+      self[`topics/${SET_USER_TOPIC}`](data.topic)
+      const posts = await fetchPosts(postsQueryWithTopic, data.topic.topicId)
+      self[`posts/${SET_USER_POST}`](posts)
       wx.navigateBack(data)
     }
   }

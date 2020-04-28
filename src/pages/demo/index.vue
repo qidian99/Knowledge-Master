@@ -11,8 +11,6 @@ import TopicCard from '@/components/topic-card'
 import { topicsQuery } from '../../utils/queries'
 import { blue } from '@ant-design/colors'
 
-console.log(blue)
-
 export default {
   components: { TopicCard },
   computed: {

@@ -25,3 +25,35 @@ export const topicsQuery = `query topics {
   }
 }`
 
+const PostFragment = `
+postId
+title
+body
+createdAt
+updatedAt
+likes
+hide
+user {
+  userId
+  openid
+  username
+}
+topic {
+  topicId
+  name
+}
+block`
+
+
+export const postsQueryWithTopic = `query posts($topicId: ID!) {
+  posts(topicId: $topicId) {
+  	${PostFragment}
+  }
+}`
+
+export const postsQueryWithoutTopic = `query posts {
+  posts {
+  	${PostFragment}
+  }
+}`
+
