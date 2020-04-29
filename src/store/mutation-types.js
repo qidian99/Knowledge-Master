@@ -9,6 +9,7 @@ export const SET_USER_TOPIC = 'SET_USER_TOPIC'
 
 // for posts page
 export const SET_USER_POST = 'SET_USER_POST'
+export const SET_REFRESH = 'SET_REFRESH'
 
 // for post page
 export const SET_HISTORY_POST = 'SET_HISTORY_POST'

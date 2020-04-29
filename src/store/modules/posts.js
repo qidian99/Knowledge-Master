@@ -1,9 +1,10 @@
-import { SET_USER_POST, SET_LIKES_OF_A_POST, SET_COMMENTS_OF_A_POST } from '../mutation-types'
+import { SET_USER_POST, SET_LIKES_OF_A_POST, SET_COMMENTS_OF_A_POST, SET_REFRESH} from '../mutation-types'
 import { deepCopy } from '../../utils'
 
 // initial state
 const state = {
-  posts: []
+  posts: [],
+  refresh: false
 }
 
 // getters
@@ -18,30 +19,39 @@ const getters = {
 const actions = {
   setPosts ({ commit, state }, posts) {
     commit(SET_USER_POST, posts)
+    commit(SET_REFRESH, true)
   },
   setLikesOfAPost ({ commit, state }, { postId, likes }) {
     console.log('setting likes of a post', likes)
     commit(SET_LIKES_OF_A_POST, { postId, likes })
+    commit(SET_REFRESH, true)
   },
   setCommentsOfAPost ({ commit, state }, { postId, comments }) {
     console.log('setting comments of a post', comments)
     commit(SET_COMMENTS_OF_A_POST, { postId, comments })
+    commit(SET_REFRESH, true)
+  },
+  setRefresh ({ commit, state }, refresh) {
+    commit(SET_REFRESH, refresh)
   }
 }
 
 // mutations
 const mutations = {
+  [SET_REFRESH] (state, refresh) {
+    state.refresh = refresh
+  },
   [SET_USER_POST] (state, posts) {
-    console.log("In set user posts:", posts)
+    console.log('In set user posts:', posts)
     state.posts = posts
   },
   [SET_LIKES_OF_A_POST] (state, { postId, likes }) {
     const post = state.posts.find((post, index) => {
-      console.log(index, post, post.postId, postId, post.postId == postId, post.postId === postId)
-      return post.postId == postId
+      console.log(index, post, post.postId, postId, post.postId === postId, post.postId === postId)
+      return post.postId === postId
     })
     if (!post) return
-    post.likes = likes;
+    post.likes = likes
     // const index = state.posts.findIndex((post, index) => {
     //   console.log(index, post, post.postId, postId, post.postId == postId, post.postId === postId)
     //   return post.postId == postId
@@ -59,8 +69,8 @@ const mutations = {
       return post.postId == postId
     })
     if (!post) return
-    post.comments = comments;
-  },
+    post.comments = comments
+  }
 }
 
 export default {

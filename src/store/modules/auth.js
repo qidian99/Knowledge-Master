@@ -19,7 +19,7 @@ const getters = {
 
 // actions
 const actions = {
-  setToken ({ commit, state }, tokenAndUser) {
+  setAuthToken ({ commit, state }, tokenAndUser) {
     console.log(tokenAndUser)
     commit(SET_AUTH_TOKEN, tokenAndUser)
   },

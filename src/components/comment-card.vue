@@ -16,7 +16,7 @@
 <script>
 import { presetPrimaryColors, grey } from "@ant-design/colors";
 import moment from "moment";
-import { mapGetters, mapState, mapMutations, mapActions } from "vuex";
+import { mapGetters, mapState, mapActions } from "vuex";
 
 export default {
   props: {

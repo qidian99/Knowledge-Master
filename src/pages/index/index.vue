@@ -2,21 +2,12 @@
   <div>
     <div v-if="topic" class="container" @click="clickHandle">
       <navigator class="b-edit-icon" url="/pages/newPost/main" hover-class="navigator-hover">
-        <!-- <div class="b-edit-icon"> -->
         <img class="edit-icon" :style="editIconStyle" src="/static/icons/edit-square-white.svg" />
-        <!-- </div> -->
       </navigator>
-      <!-- <div class="message">{{msg}}</div>
-        <ClickCounter :init-num='10' @clicknum="handleClickNum" />
-      <UserStatus />-->
-      <!-- <div class="topic-hint" v-if="topic">
-          你正在浏览{{topic.name}}话题
-          <div class="hint-posts-divisor" />
-        </div>
-      <div class="divisor-placeholder" />-->
       <div class="b-posts" v-for="(post,index) in posts" :key="index">
         <PostCard
-          v-if="test"
+          :setLikesOfAPost="setLikesOfAPost"
+          v-if="forceRefresh"
           :index="index"
           :id="post.postId"
           :post="post"
@@ -40,8 +31,8 @@ import {
   postsQueryWithTopic
 } from "../../utils/queries";
 import { fetchPosts } from "../../utils/post";
-import { mapGetters, mapState, mapMutations, mapActions } from "vuex";
-import { SET_AUTH_TOKEN, SET_USER_POST } from "../../store/mutation-types";
+import { mapGetters, mapState, mapActions } from "vuex";
+
 import { blue } from "@ant-design/colors";
 import store from "../../store";
 
@@ -49,7 +40,7 @@ export default {
   components: { ClickCounter, UserStatus, WXAuthorize, PostCard },
   data() {
     return {
-      test: true
+      forceRefresh: true
     };
   },
   async created() {
@@ -59,19 +50,16 @@ export default {
         async success(res) {
           console.log("WXAuthorize Mounted", res);
           if (res.code) {
-            // 这里可以把code传给后台，后台用此获取openid及session_key
+            // send code to backend
             console.log("Code", res.code);
-            // const res = await self.registerOpenid(res.code);
             self.registerOpenid(res.code);
-            // const posts = await fetchPosts(postsQueryWithoutTopic);
-            // self[`posts/${SET_USER_POST}`](posts)
           }
         }
       });
     } else if (self.topic && self.topic.name.length > 0) {
       console.log("Fetching all post under topic:", self.topic.name);
       const posts = await fetchPosts(postsQueryWithTopic, self.topic.topicId);
-      self[`posts/${SET_USER_POST}`](posts);
+      self.setPosts(posts);
     }
   },
   onShow: function() {
@@ -84,25 +72,21 @@ export default {
         title: "主页"
       });
     }
-    console.log("On show index posts card");
     const self = this;
     const posts = store.state.posts.posts;
-    // console.log("Get Posts", posts)
-    // this.posts = posts;
-    this.posts = Object.assign({}, this.posts);
-    this.test = false;
-    setTimeout(function() {
-      self.test = true;
-    }, 100);
-    // this[`posts/${SET_USER_POST}`](posts)
-    // this.$forceUpdate()
-    console.log("Get Posts", this.posts);
+    const refresh = store.state.posts.refresh;
+
+    if (refresh) {
+      this.forceRefresh = false;
+      setTimeout(function() {
+        self.forceRefresh = true;
+        self.setRefresh(false)
+      }, 50);
+    }
   },
   computed: {
     noTopicStyle: function() {
-      // console.log('1111')
       const screenHeight = wx.getSystemInfoSync().windowHeight;
-      // console.log(screenHeight)
       return "height: " + screenHeight + "px";
     },
     editIconStyle: function() {
@@ -119,27 +103,30 @@ export default {
     })
   },
   methods: {
+    ...mapActions("posts", {
+      setLikesOfAPost: "setLikesOfAPost"
+    }),
+    ...mapActions("posts", {
+      setPosts: 'setPosts'
+    }),
+    ...mapActions("posts", {
+      setRefresh: 'setRefresh'
+    }),
     ...mapActions("post", {
       viewPost: "viewPost"
     }),
     ...mapActions("topics", {
       setUserTopic: "setUserTopic"
     }),
-    ...mapMutations([`auth/${SET_AUTH_TOKEN}`, `posts/${SET_USER_POST}`]),
+    ...mapActions("auth", {
+      setAuthToken: "setAuthToken"
+    }),
     handlePostClick(post) {
-      console.log("Prepare to navigate to", post);
       this.viewPost(post);
-      console.log("Prepare to navigate to 2", post);
 
       wx.navigateTo({
         url: "/pages/post/main"
       });
-    },
-    clickHandle() {
-      this.msg = "Clicked!!!!!!";
-    },
-    handleClickNum(data) {
-      console.log(">>>>", data.num);
     },
     async registerOpenid(code) {
       const self = this;
@@ -162,7 +149,7 @@ export default {
       console.log("Registered, token is:", token, user);
 
       // set auth token
-      self[`auth/${SET_AUTH_TOKEN}`]({ token, user });
+      self.setAuthToken({ token, user });
 
       if (user.subscription) {
         // set subscription 
@@ -172,7 +159,7 @@ export default {
         });
         console.log("Fetching all post under topic:", self.topic.name);
         const posts = await fetchPosts(postsQueryWithTopic, self.topic.topicId);
-        self[`posts/${SET_USER_POST}`](posts);  
+        self.setPosts(posts);  
       }
     },
     onShowTopicClick: function() {

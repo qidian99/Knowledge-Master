@@ -11,6 +11,9 @@ const getters = {
   // process more
   post: (state, getters, rootState) => {
     return state.post
+  },
+  history: (state, getters, rootState) => {
+    return state.history
   }
 }
 
@@ -25,19 +28,20 @@ const actions = {
 // mutations
 const mutations = {
   [VIEW_POST] (state, post) {
-    console.log("In view post:", post)
+    console.log('In view post:', post)
     state.post = post
   },
   [SET_HISTORY_POST] (state, post) {
-    console.log("In set history post:", post)
     const temp = [...state.history]
     const found = temp.findIndex((p) => p.postId === post.postId)
-    if (found) {
-      temp.splice(found, 1);
+    if (found !== -1) {
+      temp.splice(found, 1)
     }
-    temp.push(0, post)
+    temp.unshift(post)
+    console.log('In set history post:', temp)
+
     state.history = temp
-  },
+  }
 }
 
 export default {

@@ -17,7 +17,7 @@
 
 <script>
 import WXAuthorize from "@/components/wx-authorize";
-import { mapGetters, mapState, mapMutations, mapActions } from "vuex";
+import { mapGetters, mapState, mapActions } from "vuex";
 import { UPDATE_USER_INFO } from "@/store/mutation-types";
 import SettingOption from '@/components/setting-option'
 import { updateUserProfile } from '../../utils/user'
@@ -60,10 +60,12 @@ export default {
     ...mapActions('auth', {
       setUser: 'setUser'
     }),
-    ...mapMutations([`setting/${UPDATE_USER_INFO}`]),
+    ...mapActions('setting', {
+      updateUserInfo: 'updateUserInfo'
+    }),
     async handleClick({ user }) {
       console.log("GOT USER FROM AUTHORIZE", user);
-      this[`setting/${UPDATE_USER_INFO}`](user);
+      this.updateUserInfo(user);
       const profile = await updateUserProfile(user)
       console.log('New profile', profile);
       this.setUser(profile)

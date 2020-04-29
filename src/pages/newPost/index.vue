@@ -37,8 +37,7 @@ import TopicCard from "@/components/topic-card";
 import { createPostMutation } from "../../utils/queries";
 import { createPost } from "../../utils/post";
 import { blue } from "@ant-design/colors";
-import { mapGetters, mapState, mapMutations, mapActions } from "vuex";
-import { SET_USER_TOPIC, SET_USER_POST } from "../../store/mutation-types";
+import { mapGetters, mapState, mapActions } from "vuex";
 
 const BODY_LIMIT = 200;
 export default {
@@ -77,18 +76,18 @@ export default {
     }
   },
   methods: {
-    ...mapMutations([`topics/${SET_USER_TOPIC}`, `posts/${SET_USER_POST}`]),
+    ...mapActions("topics", {
+      setUserTopic: 'setUserTopic'
+    }),
+    ...mapActions("posts", {
+      setPosts: 'setPosts'
+    }),
     handleBodyInput: function (e) {
       const {
         mp: {
           detail: { value }
         }
       } = e;
-      // console.log(e)
-      if (value.length > 10) {
-        // error
-      }
-      // console.log(value, this);
       this.body = value;
     },
     handleTitleInput: function (e) {
@@ -103,7 +102,7 @@ export default {
 
       const post = await createPost(this.topic.topicId, this.title, this.body);
       console.log(post)
-      this[`posts/${SET_USER_POST}`]([post, ...this.posts])
+      this.setPosts([post, ...this.posts])
 
       this.body = ''
       this.title = ''

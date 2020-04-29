@@ -16,9 +16,9 @@ const getters = {
 
 // actions
 const actions = {
-  getUserInfo ({ commit, state }) {
+  updateUserInfo ({ commit, state }, userInfo) {
     const savedCartItems = [...state.items]
-    commit(UPDATE_USER_INFO, null)
+    commit(UPDATE_USER_INFO, userInfo)
   }
 }
 

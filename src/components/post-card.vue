@@ -43,7 +43,7 @@
 import { presetPrimaryColors, grey } from "@ant-design/colors";
 import { likeAPost } from "../utils/post";
 import moment from "moment";
-import { mapGetters, mapState, mapMutations, mapActions } from "vuex";
+import { mapGetters, mapState, mapActions } from "vuex";
 
 // console.log("grey", presetPrimaryColors);
 export default {
@@ -59,7 +59,19 @@ export default {
     fullview: {
       type: Boolean,
       default: false
+    },
+    setLikesOfAPost: {
+      type: Function,
+      deafult: () => {}
     }
+  },
+  data() {
+    return {
+      hover: false,
+      liking: false,
+      likeArray: [],
+      commenting: false,
+    };
   },
   onLoad: function() {
     console.log("Post card loaded with props: ", this.post);
@@ -68,9 +80,6 @@ export default {
   computed: {
     ...mapGetters("auth", {
       userObj: "user"
-    }),
-    ...mapGetters("auth", {
-      token: "token"
     }),
     containerStyle: function() {
       if (this.index && this.index !== 0) {
@@ -92,6 +101,12 @@ export default {
     user: function() {
       const { user } = this.post;
       console.log('checkinguser:', user)
+
+      // check for local username
+      if (this.userObj.userId == user.userId && this.userObj.username) {
+        return 'By ' + this.userObj.username;
+      }
+
       if (user.username) {
         return 'By ' +　user.username;
       } else if (user.nickName) {
@@ -107,12 +122,6 @@ export default {
       return this.post.comments.length;
     },
     doILiked: function() {
-      // console.log(
-      //   "computing do i like",
-      //   this.likeArray,
-      //   this.userObj,
-      //   this.token
-      // );
       const index = this.likeArray.findIndex(
         u => this.userObj.userId === u.userId
       );
@@ -125,18 +134,7 @@ export default {
       return index !== -1;
     },
   },
-  data() {
-    return {
-      hover: false,
-      liking: false,
-      likeArray: [],
-      commenting: false,
-    };
-  },
   methods: {
-    ...mapActions("posts", {
-      setLikesOfAPost: "setLikesOfAPost"
-    }),
     handleClick: function() {
       console.log("Post clicked", this.post);
       this.notifyClick();

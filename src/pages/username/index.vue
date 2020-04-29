@@ -28,7 +28,7 @@ import TopicCard from "@/components/topic-card";
 import { createPostMutation } from "../../utils/queries";
 import { createPost, setUsername } from "../../utils/post";
 import { blue } from "@ant-design/colors";
-import { mapGetters, mapState, mapMutations, mapActions } from "vuex";
+import { mapGetters, mapState, mapActions } from "vuex";
 import { SET_USER_TOPIC, SET_USER_POST } from "../../store/mutation-types";
 
 const USERNAME_LIMIT = 20;

@@ -1,6 +1,6 @@
 <template>
   <div class="b-full-post">
-    <PostCard :fullview="true" :post="post" />
+    <PostCard :fullview="true" :post="post" :setLikesOfAPost="setLikesOfAPost" />
     <div class="post-card-divisor" />
 
     <div class="b-comment-panel">
@@ -38,7 +38,7 @@
 
 <script>
 import { presetPrimaryColors, grey } from "@ant-design/colors";
-import { mapGetters, mapState, mapMutations, mapActions } from "vuex";
+import { mapGetters, mapState, mapActions } from "vuex";
 import { createComment } from "../../utils/post";
 import CommentCard from "@/components/comment-card";
 import PostCard from "@/components/post-card";
@@ -46,6 +46,29 @@ import moment from "moment";
 console.log("grey", presetPrimaryColors);
 export default {
   components: { CommentCard, PostCard },
+  data() {
+    return {
+      btning: false,
+      inputText: "",
+      commentsArray: [],
+      mockPost: {
+        postId: "5ea8cf58457e6da114a1de47",
+        title: "我是加州罗志祥",
+        body: "牛逼吧",
+        createdAt: "1588121432556",
+        updatedAt: "1588121432556",
+        likes: 0,
+        hide: false,
+        user: {
+          userId: "5ea847253a89ea55c16105ec",
+          openid: "otVZc5QIASQCvzmje10-fn2EBC50",
+          username: null
+        },
+        topic: { topicId: "5ea85a2fddcdf45949b74c0d", name: "生活" },
+        block: "default"
+      }
+    };
+  },
   onLoad() {
     wx.setNavigationBarTitle({
       title: "浏览帖子"
@@ -86,30 +109,10 @@ export default {
       return this.post.comments;
     }
   },
-  data() {
-    return {
-      btning: false,
-      inputText: "",
-      commentsArray: [],
-      mockPost: {
-        postId: "5ea8cf58457e6da114a1de47",
-        title: "我是加州罗志祥",
-        body: "牛逼吧",
-        createdAt: "1588121432556",
-        updatedAt: "1588121432556",
-        likes: 0,
-        hide: false,
-        user: {
-          userId: "5ea847253a89ea55c16105ec",
-          openid: "otVZc5QIASQCvzmje10-fn2EBC50",
-          username: null
-        },
-        topic: { topicId: "5ea85a2fddcdf45949b74c0d", name: "生活" },
-        block: "default"
-      }
-    };
-  },
   methods: {
+    ...mapActions("posts", {
+      setLikesOfAPost: "setLikesOfAPost"
+    }),
     ...mapActions("posts", {
       setCommentsOfAPost: "setCommentsOfAPost"
     }),
@@ -162,9 +165,7 @@ export default {
   grid-template-rows: 40px;
   grid-template-areas: "icon input submit";
   padding: 15px 0px 15px 0px;
-  /* border-radius: 8% 8% 0% 0%; */
   background-color: #e6f7ff;
-  /* grid-gap: 5px; */
 }
 
 .comment-icon {
@@ -172,13 +173,9 @@ export default {
   width: 24px;
   height: 24px;
   place-self: center center;
-  /* justify-self: stretch; */
-  /* margin: 0px 5px; */
-  /* border: 1px solid black; */
 }
 .comment-btn {
   border-radius: 8px;
-  /* border: 1px solid black; */
   grid-area: submit;
   width: 24px;
   height: 24px;
@@ -190,38 +187,23 @@ export default {
 }
 
 .b-comment-input {
-  /* box-sizing: border-box; */
-  /* margin: 0px 10px 0px 10px; */
   grid-area: input;
-
-  /* width: 70%; */
   border-radius: 20px;
   background-color: white;
-  /* padding: 10px; */
-  /* justify-self: stretch; */
 }
 .comment-input {
   padding: 8px;
-  /* border: 1px solid #aeaeae; */
   font-size: 16px;
-  /* text-a: center; */
-  /* border: 1px solid black; */
 }
 
 .b-comments {
-  /* border: 1px solid black; */
 }
 
 .b-comments-scrollview {
-  /* box-sizing: border-box;
-  position: fixed;
-  bottom: 62px;
-  top: 200px; */
   z-index: 10;
   height: auto;
   padding: 0px 162px 0px 0px;
   width: 100%;
   margin: 0px 0px 62px 0px;
-  /* border: 1px solid black; */
 }
 </style>
