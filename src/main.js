@@ -40,7 +40,9 @@ export default {
       '^pages/index/main',
       '^pages/setting/main',
       '^pages/topics/main',
-      '^pages/newPost/main'
+      '^pages/newPost/main',
+      '^pages/post/main',
+      '^pages/username/main'
     ],
     window: {
       backgroundTextStyle: 'light',

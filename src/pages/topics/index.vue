@@ -13,6 +13,7 @@ import { blue } from '@ant-design/colors'
 import { mapGetters, mapState, mapMutations } from "vuex"
 import { SET_USER_TOPIC, SET_USER_POST } from "../../store/mutation-types"
 import { fetchPosts } from '../../utils/post'
+import { subscribeToTopic } from '../../utils/user'
 import {
   postsQueryWithTopic
 } from "../../utils/queries";
@@ -70,6 +71,7 @@ export default {
       console.log('>>>>', data, `topics/${SET_USER_TOPIC}`)
       self[`topics/${SET_USER_TOPIC}`](data.topic)
       const posts = await fetchPosts(postsQueryWithTopic, data.topic.topicId)
+      await subscribeToTopic(data.topic.topicId)
       self[`posts/${SET_USER_POST}`](posts)
       wx.navigateBack(data)
     }

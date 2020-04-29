@@ -14,7 +14,7 @@ const getters = {
   },
   user: (state, getters, rootState) => {
     return state.user
-  },
+  }
 }
 
 // actions
@@ -26,7 +26,7 @@ const actions = {
   setUser ({ commit, state }, user) {
     console.log('setting user profile', user)
     commit(SET_USER_PROFILE, user)
-  },
+  }
 }
 
 // mutations
@@ -39,7 +39,7 @@ const mutations = {
   [SET_USER_PROFILE] (state, user) {
     console.log('setting user profile', user)
     state.user = user || {}
-  },
+  }
 }
 
 export default {

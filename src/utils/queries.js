@@ -3,7 +3,11 @@ userId
 username
 nickName
 avatarUrl
-openid`
+openid
+subscription {
+  topicId
+  name
+}`
 
 export const registerQuery = `
 mutation registerOpenid($code: String!) {
@@ -83,13 +87,13 @@ comments {
 
 export const postsQueryWithTopic = `query posts($topicId: ID!) {
   posts(topicId: $topicId) {
-  	${PostFragment}
+    ${PostFragment}
   }
 }`
 
 export const postsQueryWithoutTopic = `query posts {
   posts {
-  	${PostFragment}
+    ${PostFragment}
   }
 }`
 
@@ -103,8 +107,8 @@ mutation createPost($topicId: ID! $title: String! $body: String!) {
 
 export const likeAPostMutation = `
 mutation likeAPost($postId: ID!) {
-	likeAPost(postId: $postId) {
-		userId
+  likeAPost(postId: $postId) {
+    userId
   }
 }
 `
@@ -129,7 +133,7 @@ updatedAt
 export const createCommentMutation = `
 mutation createComment($postId: ID! $body: String!) {
   createComment(postId: $postId body: $body) {
-  	${CommentFragment}
+    ${CommentFragment}
   }
 }
 `
@@ -137,9 +141,24 @@ mutation createComment($postId: ID! $body: String!) {
 export const updateUserProfileMutation = `
 mutation updateUserProfile($nickName: String!, $province: String!, $language: String!, $gender: Int!, 
   $country: String!, $city: String!, $avatarUrl: String!) {
-	updateUserProfile(nickName: $nickName, province: $province, language: $language, gender: $gender, 
+  updateUserProfile(nickName: $nickName, province: $province, language: $language, gender: $gender, 
     country: $country, city: $city, avatarUrl: $avatarUrl) {
       ${UserFragment}
   } 
 }
 `
+
+export const setUsernameMutation = `
+mutation setUsername($username: String!) {
+  setUsername(username: $username) {
+      ${UserFragment}
+  } 
+}
+`
+
+export const subscribeToTopicMutation = `
+mutation subscribeToTopic($topicId: ID!) {
+  subscribeToTopic(topicId: $topicId) {
+   ${UserFragment}
+  }
+}`

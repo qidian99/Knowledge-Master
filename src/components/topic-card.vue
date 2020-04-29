@@ -50,7 +50,7 @@ export default {
   border: 1px solid rgba(0, 0, 0, 15);
   padding: 20px;
   font-size: 28px;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.8), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.4), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   text-align: center;
   border-radius: 5px;
   margin: 10px;

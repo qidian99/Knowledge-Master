@@ -8,7 +8,7 @@
       <SettingOption navigation="topics" title="选择话题" :text="topic.name"/>
     </navigator>
     <navigator class="b-nav" url="/pages/username/main" hover-class="navigator-hover">
-      <SettingOption navigation="topics" title="设置昵称" :text="topic.name"/>
+      <SettingOption navigation="username" title="设置昵称" :text="username"/>
     </navigator>
     <WXAuthorize @clickAuthorize="handleClick" />
 
@@ -52,6 +52,9 @@ export default {
     profileKeys: function () {
       return Object.keys(this.user || {})
     },
+    username: function () {
+      return this.userInfo.username
+    }
   },
   methods: {
     ...mapActions('auth', {

@@ -5,7 +5,8 @@
     "pages/topics/main",
     "pages/demo/main",
     "pages/newPost/main",
-    "pages/post/main"
+    "pages/post/main",
+    "pages/username/main"
   ],
   "window": {
     "backgroundTextStyle": "light",

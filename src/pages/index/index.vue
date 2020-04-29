@@ -24,7 +24,8 @@
         />
       </div>
     </div>
-    <div class="dashboard-no-topic" :style="noTopicStyle" v-else>快去选择话题吧</div>
+    <div @click="onShowTopicClick" class="dashboard-no-topic" :style="noTopicStyle" v-else>快去选择话题吧</div>
+    <div @click="onShowTopicClick" class="dashboard-no-topic" :style="noTopicStyle" v-if="posts.length === 0">切换话题</div>
   </div>
 </template>
 
@@ -51,17 +52,6 @@ export default {
       test: true
     };
   },
-  onLoad() {
-    if (this.topic) {
-      wx.setNavigationBarTitle({
-        title: this.topic.name
-      });
-      return;
-    }
-    wx.setNavigationBarTitle({
-      title: "主页"
-    });
-  },
   async created() {
     self = this;
     if (!self.token) {
@@ -71,7 +61,8 @@ export default {
           if (res.code) {
             // 这里可以把code传给后台，后台用此获取openid及session_key
             console.log("Code", res.code);
-            await self.registerOpenid(res.code);
+            // const res = await self.registerOpenid(res.code);
+            self.registerOpenid(res.code);
             // const posts = await fetchPosts(postsQueryWithoutTopic);
             // self[`posts/${SET_USER_POST}`](posts)
           }
@@ -84,6 +75,15 @@ export default {
     }
   },
   onShow: function() {
+    if (this.topic) {
+      wx.setNavigationBarTitle({
+        title: this.topic.name
+      });
+    } else {  
+      wx.setNavigationBarTitle({
+        title: "主页"
+      });
+    }
     console.log("On show index posts card");
     const self = this;
     const posts = store.state.posts.posts;
@@ -121,6 +121,9 @@ export default {
   methods: {
     ...mapActions("post", {
       viewPost: "viewPost"
+    }),
+    ...mapActions("topics", {
+      setUserTopic: "setUserTopic"
     }),
     ...mapMutations([`auth/${SET_AUTH_TOKEN}`, `posts/${SET_USER_POST}`]),
     handlePostClick(post) {
@@ -160,6 +163,22 @@ export default {
 
       // set auth token
       self[`auth/${SET_AUTH_TOKEN}`]({ token, user });
+
+      if (user.subscription) {
+        // set subscription 
+        self.setUserTopic(user.subscription)
+        wx.setNavigationBarTitle({
+          title: user.subscription.name
+        });
+        console.log("Fetching all post under topic:", self.topic.name);
+        const posts = await fetchPosts(postsQueryWithTopic, self.topic.topicId);
+        self[`posts/${SET_USER_POST}`](posts);  
+      }
+    },
+    onShowTopicClick: function() {
+      wx.navigateTo({
+        url: "/pages/topics/main"
+      });
     }
   }
 };
