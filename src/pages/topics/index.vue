@@ -21,12 +21,13 @@ export default {
   components: { TopicCard },
   data () {
     return {
-      topics: [{
-        name: "test1"
-      }, {
-        name: "test2"
-      }]
+      topics: []
     }
+  },
+  onLoad(){
+    wx.setNavigationBarTitle({
+      title:'选择话题',
+    })
   },
   async mounted() {
     self = this
@@ -79,7 +80,7 @@ export default {
 <style scoped>
 .container.is--grid {
   display: grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: auto;
   padding: 10px;
   background-color: rgba(0, 0, 0, 0.04);
 }

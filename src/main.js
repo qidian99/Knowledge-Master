@@ -38,12 +38,14 @@ export default {
   config: {
     pages: [
       '^pages/index/main',
-      '^pages/setting/main'
+      '^pages/setting/main',
+      '^pages/topics/main',
+      '^pages/newPost/main'
     ],
     window: {
       backgroundTextStyle: 'light',
       navigationBarBackgroundColor: '#fff',
-      navigationBarTitleText: '第一个小程序',
+      navigationBarTitleText: 'Knowledge Master',
       navigationBarTextStyle: 'black'
     }
   }

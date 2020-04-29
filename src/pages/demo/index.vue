@@ -1,74 +1,152 @@
 <template>
-  <div class="container is--grid" @click="clickHandle" :style="gridStyle">
-    <div class="b-topic is--griditem" v-for="(item,index) in topics" :key="index">
-      <TopicCard :topic="item.name" @clicktopic="handleClickTopic"/>
-    </div>
+  <div
+    @touchstart="hover = true"
+    @touchend="hover = false"
+    class="b-post-card"
+    :class="{ active: hover }"
+    @click="handleClick"
+    :style="containerStyle"
+  >
+    <div class="post-card-title">{{title}}</div>
+    <div class="post-card-divisor" />
+    <div class="post-card-body">{{body}}</div>
+    <div class="card-time">{{time}}</div>
+    <div class="card-user">{{user}}</div>
+    <!-- <div class="post-card-other">{{likes}}</div> -->
   </div>
 </template>
 
 <script>
-import TopicCard from '@/components/topic-card'
-import { topicsQuery } from '../../utils/queries'
-import { blue } from '@ant-design/colors'
-
+import { presetPrimaryColors, grey } from "@ant-design/colors";
+import moment from "moment";
+console.log("grey", presetPrimaryColors);
 export default {
-  components: { TopicCard },
+  props: {
+    post: {
+      type: Object,
+      default: null
+    },
+    index: {
+      type: Number,
+      default: -1
+    }
+  },
   computed: {
-    gridStyle: function () {
-      return 'background-color:' + blue[0]
-    }
-  },
-  async mounted() {
-    self = this
-    console.log('Topics Mounted')
-    const payload = {
-      query: topicsQuery,
-    }
-    const r = await self.$http.post({
-      payload
-    })
-    
-    const {
-      data: {
-        topics
+    containerStyle: function () {
+      if (this.index !== 0) {
+        return "margin-top: -5%;"
       }
-    } = r
+    },
+    title: function () {
+      return this.post.title;
+    },
+    body: function () {
+      return this.post.body;
+    },
+    time: function () {
+      if (moment() - this.post.createdAt < 86400000 / 6) {
+        return moment(this.post.createdAt, "x").fromNow();
+      }
+      return moment(this.post.createdAt, "x").format("YYYY/MM/DD hh:mm");
 
-    console.log('Topics Fetched:', topics)
-
-    self.topics = topics
-
-    // self.notifyUserInfo(user)
-  },
-  data () {
-    return {
-      topics: []
+    },
+    user: function () {
+      const { user } = this.post;
+      if (user.username) {
+        return user.username;
+      } else {
+        return `用户 ${user.openid.slice(0, 5)}****`;
+      }
+    },
+    likes: function () {
+      return this.post.likes;
     }
+  },
+  data() {
+    return {
+      hover: false
+    };
   },
   methods: {
-    handleClickTopic (data) {
-      console.log('>>>>', data)
-      wx.navigateBack(data)
+    handleClick: function () {
+      console.log("Posts clicked");
     }
+    // notifiyTopic () {
+    //   this.$emit('clicktopic', {
+    //     topic: this.topic
+    //   })
+    // }
   }
-}
+};
 </script>
 
 <style scoped>
-.container.is--grid {
+.b-post-card {
+  /* border: 10px solid red; */
   display: grid;
-  grid-template-columns: auto auto;
-  padding: 10px;
-}
-.b-topic.is--griditem {
+  grid-template-columns: 50% 50%;
+  grid-template-rows: auto;
+  grid-template-areas: "title title" "div div" "body body" "time user";
   background-color: rgba(255, 255, 255, 0.8);
-  border: 1px dashed rgba(0, 0, 0, 0.8);
-  padding: 20px;
-  font-size: 30px;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  /* height: 400px; */
+  font-size: 24;
+  /* border: 1px solid rgba(0, 0, 0, 15); */
+}
+
+.b-post-card.active {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
+.post-card-divisor {
+  grid-area: div;
+  width: 100%;
+  margin: 0px 0px 0px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.post-card-title {
+  grid-area: title;
+  color: rgba(0, 0, 0, 0.85);
+  padding: 10px 20px 10px;
+  font-family: Microsoft Yahei;
+  font-size: 22px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.post-card-body {
+  grid-area: body;
+  color: rgba(0, 0, 0, 0.65);
+  padding: 10px 20px 10px;
+  font-size: 16px;
+  font-weight: normal;
+  text-align: left;
+}
+
+.post-card-other {
+  color: rgba(0, 0, 0, 0.45);
+  padding: 10px 20px 10px;
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.card-time {
+  text-align: left;
+  color: rgba(0, 0, 0, 0.45);
+  padding: 0px 20px 10px;
+  font-size: 14px;
+  font-weight: normal;
+  grid-area: time;
+}
+
+.card-user {
+  grid-area: user;
+  text-align: right;
+  width: auto;
+  color: rgba(0, 0, 0, 0.45);
+  justify-items: right;
+  margin-right: 20px;
+  font-size: 14px;
+  font-weight: normal;
+  /* border: 10px solid black; */
 }
 </style>

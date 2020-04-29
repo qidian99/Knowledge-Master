@@ -1,19 +1,30 @@
 <template>
-  <div class="container" @click="clickHandle">
-    <div class="b-edit-icon">
-      <img class="edit-icon" :style="editIconStyle" src="/static/icons/edit-square-white.svg" />
+  <div>
+    <div v-if="topic" class="container" @click="clickHandle">
+      <navigator class="b-edit-icon" url="/pages/newPost/main" hover-class="navigator-hover">
+        <!-- <div class="b-edit-icon"> -->
+        <img class="edit-icon" :style="editIconStyle" src="/static/icons/edit-square-white.svg" />
+        <!-- </div> -->
+      </navigator>
+      <!-- <div class="message">{{msg}}</div>
+        <ClickCounter :init-num='10' @clicknum="handleClickNum" />
+      <UserStatus />-->
+      <!-- <div class="topic-hint" v-if="topic">
+          你正在浏览{{topic.name}}话题
+          <div class="hint-posts-divisor" />
+        </div>
+      <div class="divisor-placeholder" />-->
+      <div class="b-posts" v-for="(post,index) in posts" :key="index">
+        <PostCard
+          v-if="test"
+          :index="index"
+          :id="post.postId"
+          :post="post"
+          @clickpost="handlePostClick"
+        />
+      </div>
     </div>
-    <!-- <div class="message">{{msg}}</div>
-    <ClickCounter :init-num='10' @clicknum="handleClickNum" />
-    <UserStatus />-->
-    <div class="topic-hint" v-if="topic">
-      你正在浏览{{topic.name}}话题
-      <div class="hint-posts-divisor" />
-    </div>
-    <div class="divisor-placeholder" />
-    <div class="b-posts" v-for="(post,index) in posts" :key="index">
-      <PostCard :index="index" :id="post.postId" :post="post" />
-    </div>
+    <div class="dashboard-no-topic" :style="noTopicStyle" v-else>快去选择话题吧</div>
   </div>
 </template>
 
@@ -31,16 +42,28 @@ import { fetchPosts } from "../../utils/post";
 import { mapGetters, mapState, mapMutations, mapActions } from "vuex";
 import { SET_AUTH_TOKEN, SET_USER_POST } from "../../store/mutation-types";
 import { blue } from "@ant-design/colors";
+import store from "../../store";
 
 export default {
   components: { ClickCounter, UserStatus, WXAuthorize, PostCard },
   data() {
     return {
+      test: true
     };
+  },
+  onLoad() {
+    if (this.topic) {
+      wx.setNavigationBarTitle({
+        title: this.topic.name
+      });
+      return;
+    }
+    wx.setNavigationBarTitle({
+      title: "主页"
+    });
   },
   async created() {
     self = this;
-    // console.log("topic: ", self.topic)
     if (!self.token) {
       wx.login({
         async success(res) {
@@ -49,21 +72,39 @@ export default {
             // 这里可以把code传给后台，后台用此获取openid及session_key
             console.log("Code", res.code);
             await self.registerOpenid(res.code);
-            const posts = await fetchPosts(postsQueryWithoutTopic);
-            self[`posts/${SET_USER_POST}`](posts)
+            // const posts = await fetchPosts(postsQueryWithoutTopic);
+            // self[`posts/${SET_USER_POST}`](posts)
           }
         }
       });
     } else if (self.topic && self.topic.name.length > 0) {
       console.log("Fetching all post under topic:", self.topic.name);
       const posts = await fetchPosts(postsQueryWithTopic, self.topic.topicId);
-      self[`posts/${SET_USER_POST}`](posts)
-    } else {
-      const posts = await fetchPosts(postsQueryWithoutTopic);
-      self[`posts/${SET_USER_POST}`](posts)
+      self[`posts/${SET_USER_POST}`](posts);
     }
   },
+  onShow: function() {
+    console.log("On show index posts card");
+    const self = this;
+    const posts = store.state.posts.posts;
+    // console.log("Get Posts", posts)
+    // this.posts = posts;
+    this.posts = Object.assign({}, this.posts);
+    this.test = false;
+    setTimeout(function() {
+      self.test = true;
+    }, 100);
+    // this[`posts/${SET_USER_POST}`](posts)
+    // this.$forceUpdate()
+    console.log("Get Posts", this.posts);
+  },
   computed: {
+    noTopicStyle: function() {
+      // console.log('1111')
+      const screenHeight = wx.getSystemInfoSync().windowHeight;
+      // console.log(screenHeight)
+      return "height: " + screenHeight + "px";
+    },
     editIconStyle: function() {
       return "background-color:" + blue.primary;
     },
@@ -78,7 +119,19 @@ export default {
     })
   },
   methods: {
+    ...mapActions("post", {
+      viewPost: "viewPost"
+    }),
     ...mapMutations([`auth/${SET_AUTH_TOKEN}`, `posts/${SET_USER_POST}`]),
+    handlePostClick(post) {
+      console.log("Prepare to navigate to", post);
+      this.viewPost(post);
+      console.log("Prepare to navigate to 2", post);
+
+      wx.navigateTo({
+        url: "/pages/post/main"
+      });
+    },
     clickHandle() {
       this.msg = "Clicked!!!!!!";
     },
@@ -103,10 +156,10 @@ export default {
         }
       } = r;
 
-      console.log("Registered, token is:", token);
+      console.log("Registered, token is:", token, user);
 
       // set auth token
-      self[`auth/${SET_AUTH_TOKEN}`](token);
+      self[`auth/${SET_AUTH_TOKEN}`]({ token, user });
     }
   }
 };
@@ -117,6 +170,7 @@ export default {
   position: fixed;
   bottom: 10px;
   right: 20px;
+  border-radius: 50%;
 }
 .edit-icon {
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.4), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
@@ -157,5 +211,13 @@ export default {
 
 .divisor-placeholder {
   padding-top: 13%;
+  background-color: transparent;
+}
+
+.dashboard-no-topic {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
 }
 </style>

@@ -16,10 +16,10 @@ function request (url, method, payload, header = {}) {
     if (method === 'POST') {
       // for graphql
       const token = store.state.auth.token
-      console.log(
-        'jwt token:',
-        token
-      )
+      // console.log(
+      //   'jwt token:',
+      //   token
+      // )
 
       if (token) {
         header = {...header, authorization: `Bearer ${token}`}

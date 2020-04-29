@@ -3,7 +3,8 @@ import Vuex from 'vuex'
 import setting from './modules/setting'
 import topics from './modules/topics'
 import auth from './modules/auth'
-import posts from './modules/posts'
+import posts from './modules/posts' // posts under topics
+import post from './modules/post' // post related to user's browsing history
 import createLogger from '../plugins/logger'
 import createPersistedState from 'vuex-persistedstate'
 
@@ -16,7 +17,8 @@ export default new Vuex.Store({
     setting,
     topics,
     auth,
-    posts
+    posts,
+    post
   },
   strict: debug,
   // plugins: debug ? [createLogger()] : []

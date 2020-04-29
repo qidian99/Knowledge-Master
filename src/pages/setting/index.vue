@@ -7,6 +7,9 @@
     <navigator class="b-nav" url="/pages/topics/main" hover-class="navigator-hover">
       <SettingOption navigation="topics" title="选择话题" :text="topic.name"/>
     </navigator>
+    <navigator class="b-nav" url="/pages/username/main" hover-class="navigator-hover">
+      <SettingOption navigation="topics" title="设置昵称" :text="topic.name"/>
+    </navigator>
     <WXAuthorize @clickAuthorize="handleClick" />
 
   </div>
@@ -14,14 +17,20 @@
 
 <script>
 import WXAuthorize from "@/components/wx-authorize";
-import { mapGetters, mapState, mapMutations } from "vuex";
+import { mapGetters, mapState, mapMutations, mapActions } from "vuex";
 import { UPDATE_USER_INFO } from "@/store/mutation-types";
 import SettingOption from '@/components/setting-option'
+import { updateUserProfile } from '../../utils/user'
 
 export default {
   components: {
     WXAuthorize,
     SettingOption
+  },
+  onLoad(){
+    wx.setNavigationBarTitle({
+      title:'设置',
+    })
   },
   created() {
     console.log("Setting: user profile", this.user, this.profileKeys);
@@ -31,10 +40,11 @@ export default {
   },
   computed: {
     ...mapState({
-      user: state => state.setting.userInfo
+      // user: state => state.setting.userInfo
+      user: state => state.auth.user
     }),
-    ...mapGetters("setting", {
-      userInfo: "userInfo"
+    ...mapGetters("auth", {
+      userInfo: "user"
     }),
     ...mapGetters("topics", {
       topic: "topic"
@@ -44,11 +54,16 @@ export default {
     },
   },
   methods: {
+    ...mapActions('auth', {
+      setUser: 'setUser'
+    }),
     ...mapMutations([`setting/${UPDATE_USER_INFO}`]),
-    handleClick({ user }) {
+    async handleClick({ user }) {
       console.log("GOT USER FROM AUTHORIZE", user);
       this[`setting/${UPDATE_USER_INFO}`](user);
-      console.log(this.user);
+      const profile = await updateUserProfile(user)
+      console.log('New profile', profile);
+      this.setUser(profile)
     }
   }
 };
