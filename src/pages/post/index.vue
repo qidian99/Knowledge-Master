@@ -5,6 +5,7 @@
       :post="post"
       :setLikesOfAPost="setLikesOfAPost"
       @clickdelete="handleDelete"
+      @clickuser="handleViewUser"
     />
     <div class="post-card-divisor" />
 
@@ -12,6 +13,7 @@
       <img class="comment-icon" src="/static/icons/edit-square.svg" />
       <div class="b-comment-input">
         <input
+          cursor-spacing="140"
           maxlength="150"
           :value="inputText"
           class="comment-input"
@@ -39,7 +41,7 @@
         />
       </ScrollView>
     </div>
-    <modal
+    <!-- <modal
       title="删除评论"
       confirm-text="确定"
       cancel-text="取消"
@@ -54,7 +56,7 @@
       :hidden="modalHidden"
       @confirm="modalConfirm"
       @cancel="modalCancel"
-    >你可别后悔</modal>
+    >你可别后悔</modal> -->
   </div>
 </template>
 
@@ -73,8 +75,6 @@ export default {
       btning: false,
       inputText: "",
       commentsArray: [],
-      modalHidden: true, // for post
-      commentModalHidden: true, // for comments
       commentToDelete: null,
       mockPost: {
         postId: "5ea8cf58457e6da114a1de47",
@@ -140,6 +140,9 @@ export default {
       setCommentsOfAPost: "setCommentsOfAPost",
       setPosts: "setPosts"
     }),
+    ...mapActions("user", {
+      setViewOtherUser: "setViewOtherUser"
+    }),
     ...mapActions({
       removePost: "removePost"
     }),
@@ -176,7 +179,6 @@ export default {
       this.addComment(c);
     },
     commentModalConfirm: async function() {
-      this.commentModalHidden = true;
       try {
         const res = await deleteComment(this.commentToDelete.commentId);
         console.log("Delete res", res);
@@ -197,14 +199,25 @@ export default {
     },
     commentModalCancel: function() {
       this.commentToDelete = null;
-      this.commentModalHidden = true;
     },
     handleCommentDelete: async function(comment) {
+      const self = this
       this.commentToDelete = comment;
-      this.commentModalHidden = false;
+      wx.showModal({
+        title: '删除评论',
+        content: '目前不支持Archive，删除不可逆',
+        success (res) {
+          if (res.confirm) {
+            console.log('用户点击确定')
+            self.commentModalConfirm()
+          } else if (res.cancel) {
+            console.log('用户点击取消')
+            self.commentModalCancel()
+          }
+        }
+      })
     },
     modalConfirm: async function() {
-      this.modalHidden = true;
       try {
         const res = await deletePost(this.post.postId);
         console.log("Delete res", res);
@@ -215,11 +228,30 @@ export default {
       }
     },
     modalCancel: function() {
-      this.modalHidden = true;
     },
     handleDelete: async function(post) {
-      this.modalHidden = false;
-    }
+      const self = this
+      wx.showModal({
+        title: '删除帖子',
+        content: '目前不支持Archive，删除不可逆',
+        success (res) {
+          if (res.confirm) {
+            console.log('用户点击确定')
+            self.modalConfirm()
+          } else if (res.cancel) {
+            console.log('用户点击取消')
+            self.modalCancel()
+          }
+        }
+      })
+    },
+    handleViewUser: async function(user) {
+      console.log("other user clicked", user)
+      this.setViewOtherUser(user)
+      wx.navigateTo({
+        url: "/pages/user/main"
+      })
+    },
   }
 };
 </script>
@@ -245,7 +277,7 @@ export default {
   grid-template-columns: 50px auto 50px;
   grid-template-rows: 40px;
   grid-template-areas: "icon input submit";
-  padding: 15px 0px 40px 0px;
+  padding: 15px 0px 15px 0px;
   background-color: #e6f7ff;
 }
 
@@ -283,8 +315,8 @@ export default {
 .b-comments-scrollview {
   z-index: 10;
   height: auto;
-  padding: 0px 162px 0px 0px;
+  /* padding: 0px 162px 0px 0px; */
   width: 100%;
-  margin: 0px 0px 62px 0px;
+  margin: 0px 0px 120px 0px;
 }
 </style>

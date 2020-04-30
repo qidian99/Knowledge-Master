@@ -13,6 +13,7 @@
           :post="post"
           @clickpost="handlePostClick"
           @clickdelete="handleDelete"
+          @clickuser="handleViewUser"
         />
       </div>
     </div>
@@ -131,17 +132,17 @@ export default {
     })
   },
   methods: {
-    ...mapActions("posts", {
-      setLikesOfAPost: "setLikesOfAPost"
-    }),
     ...mapActions({
       removePost: "removePost"
     }),
     ...mapActions("posts", {
-      setPosts: "setPosts"
+      setPosts: "setPosts",
+      setRefresh: "setRefresh",
+      updatePost: "updatePost",
+      setLikesOfAPost: "setLikesOfAPost"
     }),
-    ...mapActions("posts", {
-      setRefresh: "setRefresh"
+    ...mapActions("user", {
+      setViewOtherUser: "setViewOtherUser"
     }),
     ...mapActions("topics", {
       setUserTopic: "setUserTopic"
@@ -151,9 +152,6 @@ export default {
     }),
     ...mapActions("post", {
       viewPost: "viewPost"
-    }),
-    ...mapActions("posts", {
-      updatePost: "updatePost"
     }),
     async handlePostClick(post) {
       let newPost;
@@ -242,6 +240,13 @@ export default {
     handleDelete: async function(post) {
       this.postToDelete = post;
       this.modalHidden = false;
+    },
+    handleViewUser: async function(user) {
+      console.log("other user clicked", user);
+      this.setViewOtherUser(user);
+      wx.navigateTo({
+        url: "/pages/user/main"
+      });
     }
   }
 };
@@ -279,9 +284,9 @@ export default {
 }
 
 .container {
-  display: block;
-  /* background-color: transparent; */
-  background-color: rgba(0, 0, 0, 0.08);
+  /* min-height: 2000px; */
+  background-color: transparent;
+  /* background-color: rgba(0, 0, 0, 0.08); */
 }
 
 .b-posts {
@@ -301,5 +306,11 @@ export default {
   flex: 1;
   justify-content: center;
   align-items: center;
+}
+</style>
+
+<style>
+page {
+  background: rgba(0, 0, 0, 0.08);
 }
 </style>

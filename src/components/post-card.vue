@@ -16,7 +16,14 @@
       @click="handleClick"
     >{{body}}</div>
     <div class="card-time">{{time}}</div>
-    <div v-if="!isMyPost" class="card-user">{{user}}</div>
+    <div
+      v-if="!isMyPost"
+      @click="handleViewUser"
+      @touchstart="clickuser = true"
+      @touchend="clickuser = false"
+      :class="{ active: clickuser }"
+      class="card-user"
+    >{{user}}</div>
     <div class="b-post-card is--meta">
       <div
         class="card-like"
@@ -77,7 +84,7 @@ export default {
     setLikesOfAPost: {
       type: Function,
       deafult: () => {}
-    },
+    }
   },
   data() {
     return {
@@ -86,7 +93,8 @@ export default {
       liking: false,
       likeArray: [],
       commenting: false,
-      deleting: false
+      deleting: false,
+      clickuser: false
     };
   },
   onLoad: function() {
@@ -175,9 +183,12 @@ export default {
       this.likeArray = likes;
       this.setLikesOfAPost({ postId: this.post.postId, likes });
     },
-    handleDelete () {
+    handleDelete() {
       this.$emit("clickdelete", this.post);
     },
+    handleViewUser() {
+      this.$emit("clickuser", this.post.user);
+    }
   }
 };
 </script>
@@ -233,7 +244,7 @@ export default {
 }
 
 .post-delete.active {
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(0, 0, 0, 0.15);
 }
 
 .post-card-body {
@@ -246,10 +257,10 @@ export default {
 }
 
 .post-card-title.active {
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(0, 0, 0, 0.15);
 }
 .post-card-body.active {
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(0, 0, 0, 0.15);
 }
 
 .post-card-other {
@@ -278,7 +289,12 @@ export default {
   font-size: 14px;
   font-weight: normal;
   /* border: 10px solid black; */
+  color: #1296db;
 }
+.card-user.active {
+  opacity: 0.7;
+}
+
 
 .card-comment {
   display: flex;
@@ -292,7 +308,7 @@ export default {
 }
 
 .card-comment.active {
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(0, 0, 0, 0.15);
 }
 
 .card-bottom-text {
@@ -313,11 +329,11 @@ export default {
   font-size: 14px;
   font-weight: normal;
   color: rgba(0, 0, 0, 0.45);
-  /* background-color: rgba(0, 0, 0, 0.25); */
+  /* background-color: rgba(0, 0, 0, 0.15); */
   /* border: 10px solid black; */
 }
 
 .card-like.active {
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(0, 0, 0, 0.15);
 }
 </style>

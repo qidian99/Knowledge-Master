@@ -115,7 +115,7 @@ export default {
 
 /* .b-comment-card.active { */
 .comment-card-body.active {
-  /* background-color: rgba(0, 0, 0, 0.25); */
+  /* background-color: rgba(0, 0, 0, 0.15); */
 }
 
 .comment-card-divisor {
@@ -185,7 +185,7 @@ export default {
 }
 
 .card-comment.active {
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(0, 0, 0, 0.15);
 }
 
 .card-bottom-text {
@@ -206,12 +206,12 @@ export default {
   font-size: 14px;
   font-weight: normal;
   color: rgba(0, 0, 0, 0.45);
-  /* background-color: rgba(0, 0, 0, 0.25); */
+  /* background-color: rgba(0, 0, 0, 0.15); */
   /* border: 10px solid black; */
 }
 
 .card-like.active {
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(0, 0, 0, 0.15);
 }
 
 
@@ -227,7 +227,7 @@ export default {
 }
 
 .comment-delete.active {
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(0, 0, 0, 0.15);
 }
 
 </style>

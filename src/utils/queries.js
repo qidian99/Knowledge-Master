@@ -207,3 +207,7 @@ export const findUserPostsQuery = `query findUserPosts {
     }
   }
 }`
+
+export const sendTemplateMutation = `mutation sendTemplate {
+  sendTemplate
+}`

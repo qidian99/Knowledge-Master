@@ -93,7 +93,7 @@ export default {
 }
 
 .b-post-card.active {
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(0, 0, 0, 0.15);
 }
 
 .post-card-divisor {

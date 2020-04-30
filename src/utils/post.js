@@ -6,7 +6,8 @@ import {
   setUsernameMutation,
   postQuery,
   deletePostMutation,
-  deleteCommentMutation
+  deleteCommentMutation,
+  sendTemplateMutation
 } from './queries'
 
 
@@ -189,4 +190,22 @@ export async function setUsername (username) {
 
   console.log('username set', setUsername)
   return setUsername
+}
+
+export async function sendTemplateMessage () {
+  const payload = {
+    query: sendTemplateMutation
+  }
+  const r = await http.post({
+    payload
+  })
+
+  const {
+    data: {
+      sendTemplate
+    }
+  } = r
+
+  console.log('set template', sendTemplate)
+  return sendTemplate
 }

@@ -19,9 +19,9 @@
     <div class="clear-storage">
       <button @click="handleClear">清空本地缓存</button>
     </div>
-    <modal title="清空本地缓存" confirm-text="确定" cancel-text="取消" :hidden="modalHidden" @confirm="modalConfirm" @cancel="modalCancel">
+    <!-- <modal title="清空本地缓存" confirm-text="确定" cancel-text="取消" :hidden="modalHidden" @confirm="modalConfirm" @cancel="modalCancel">
       本地历史，帖子将被删除。
-    </modal>
+    </modal>-->
   </div>
 </template>
 
@@ -32,12 +32,12 @@ import { UPDATE_USER_INFO } from "@/store/mutation-types";
 import SettingOption from "@/components/setting-option";
 import { updateUserProfile } from "../../utils/user";
 import { fetchPosts } from "../../utils/post";
-import { registerQuery, postsQueryWithTopic } from "../../utils/queries"
+import { registerQuery, postsQueryWithTopic } from "../../utils/queries";
 
 export default {
   components: {
     WXAuthorize,
-    SettingOption,
+    SettingOption
   },
   onLoad() {
     wx.setNavigationBarTitle({
@@ -61,7 +61,7 @@ export default {
       userInfo: "user"
     }),
     ...mapGetters("topics", {
-      topic: "topic",
+      topic: "topic"
     }),
     profileKeys: function() {
       return Object.keys(this.user || {});
@@ -76,19 +76,19 @@ export default {
       setAuthToken: "setAuthToken"
     }),
     ...mapActions("posts", {
-      setPosts: "setPosts",
+      setPosts: "setPosts"
     }),
     ...mapActions("topics", {
       setUserTopic: "setUserTopic"
     }),
     ...mapActions({
-      clearAll: 'clearAll'
+      clearAll: "clearAll"
     }),
     ...mapActions("setting", {
       updateUserInfo: "updateUserInfo"
     }),
-    modalConfirm: function (e) {
-      const self = this
+    modalConfirm: function(e) {
+      const self = this;
       self.modalHidden = true;
       try {
         self.clearAll();
@@ -104,10 +104,10 @@ export default {
         });
         // wx.clearStorageSync();
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
     },
-    modalCancel: function (e) {
+    modalCancel: function(e) {
       this.modalHidden = true;
     },
     async handleClick({ user }) {
@@ -118,7 +118,20 @@ export default {
       this.setUser(profile);
     },
     async handleClear() {
-      this.modalHidden = false;
+      const self = this;
+      wx.showModal({
+        title: "清空本地缓存",
+        content: "本地历史记录等数据将被清除",
+        success(res) {
+          if (res.confirm) {
+            console.log("用户点击确定");
+            self.modalConfirm();
+          } else if (res.cancel) {
+            console.log("用户点击取消");
+            self.modalCancel();
+          }
+        }
+      });
     },
     async registerOpenid(code) {
       const self = this;
@@ -144,16 +157,16 @@ export default {
       self.setAuthToken({ token, user });
 
       if (user.subscription) {
-        // set subscription 
-        self.setUserTopic(user.subscription)
+        // set subscription
+        self.setUserTopic(user.subscription);
         wx.setNavigationBarTitle({
           title: user.subscription.name
         });
         console.log("Fetching all post under topic:", self.topic.name);
         const posts = await fetchPosts(postsQueryWithTopic, self.topic.topicId);
-        self.setPosts(posts);  
+        self.setPosts(posts);
       }
-    },
+    }
   }
 };
 </script>

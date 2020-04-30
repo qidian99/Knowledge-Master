@@ -8,6 +8,7 @@ import store from './store'
 Vue.config.productionTip = false
 Vue.prototype.$http = WXrequest
 Vue.prototype.$store = store
+// Vue.loadScript('/js/cos-js-sdk-v5.min.js') // no loader
 
 // 测试过 不太可用
 // Vue.use(icons)
@@ -43,7 +44,9 @@ export default {
       '^pages/post/main',
       '^pages/username/main',
       '^pages/history/main',
-      '^pages/dev/main'
+      '^pages/dev/main',
+      '^pages/user/main'
+
     ],
     window: {
       backgroundTextStyle: 'light',

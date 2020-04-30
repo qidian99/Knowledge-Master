@@ -70,11 +70,11 @@ export default {
       } else {
         // 离线浏览
         this.viewPost(post);
-          wx.navigateTo({
+        wx.navigateTo({
           url: "/pages/post/main"
         });
       }
-    },
+    }
   }
 };
 </script>
@@ -89,7 +89,13 @@ export default {
 
 .container {
   display: block;
-  /* background-color: transparent; */
-  background-color: rgba(0, 0, 0, 0.08);
+  background-color: transparent;
+  /* background-color: rgba(0, 0, 0, 0.08); */
+}
+</style>
+
+<style>
+page{
+  background: rgba(0, 0, 0, 0.08);;
 }
 </style>

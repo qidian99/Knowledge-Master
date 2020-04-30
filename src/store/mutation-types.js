@@ -25,4 +25,8 @@ export const ADD_COMMENT = 'ADD_COMMENT'
 export const SET_AUTH_TOKEN = 'SET_AUTH_TOKEN'
 export const SET_USER_PROFILE = 'SET_USER_PROFILE'
 
+// for user
+export const SET_VIEW_OTHER_USER = 'SET_VIEW_OTHER_USER'
+
+
 // for other page

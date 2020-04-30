@@ -1,7 +1,7 @@
 <template>
   <div class="container is--grid" @click="clickHandle" :style="gridStyle">
     <div class="b-topic is--griditem" v-for="(item,index) in topics" :key="index">
-      <TopicCard :id="item.topicId" :topic="item" @clicktopic="handleClickTopic" />
+      <TopicCard :id="index" :topic="item" @clicktopic="handleClickTopic" />
     </div>
   </div>
 </template>
@@ -74,7 +74,7 @@ export default {
       const posts = await fetchPosts(postsQueryWithTopic, data.topic.topicId);
       await subscribeToTopic(data.topic.topicId);
       self.setPosts(posts);
-      wx.navigateBack(data)
+      wx.navigateBack(data);
       wx.switchTab({
         url: "/pages/index/main"
       });
@@ -88,12 +88,19 @@ export default {
   display: grid;
   grid-template-columns: auto;
   padding: 10px;
-  background-color: rgba(0, 0, 0, 0.04);
+  /* background-color: rgba(0, 0, 0, 0.04); */
+  background-color: transparent;
 }
 .b-topic.is--griditem {
   display: flex;
   justify-content: center;
   align-items: center;
   /* height: 400px; */
+}
+</style>
+
+<style>
+page {
+  background: rgba(0, 0, 0, 0.08);
 }
 </style>
