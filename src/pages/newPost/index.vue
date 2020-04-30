@@ -25,7 +25,9 @@
         </div>
       </div>
     </div>
-
+    <div class="err-message" v-if="showErr">
+      {{errMsg}}
+    </div>
     <div class="weui-btn-area">
       <button class="weui-btn" :style="submitStyle" type="primary" @click="submitPost" :disabled="bodyError">确定</button>
     </div>
@@ -44,6 +46,7 @@ export default {
   components: { TopicCard },
   data() {
     return {
+      showErr: false,
       title: "",
       body: "",
       BODY_LIMIT,
@@ -73,6 +76,20 @@ export default {
     },
     bodyError: function () {
       return this.body.length > BODY_LIMIT
+    },
+    errMsg: function () {
+      let msg = ''
+      if (this.title.length === 0) {
+        msg += '请输入标题'
+        if (this.body.length === 0) {
+          msg += '和内容'
+        }
+      } else if (this.body.length === 0) {
+        msg = '请输入内容'
+      } else {
+        msg = '服务器无响应'
+      }
+      return msg;
     }
   },
   methods: {
@@ -83,6 +100,7 @@ export default {
       setPosts: 'setPosts'
     }),
     handleBodyInput: function (e) {
+      this.showErr = false;
       const {
         mp: {
           detail: { value }
@@ -91,6 +109,7 @@ export default {
       this.body = value;
     },
     handleTitleInput: function (e) {
+      this.showErr = false;
       const {
         mp: {
           detail: { value }
@@ -99,15 +118,18 @@ export default {
       this.title = value;
     },
     submitPost: async function () {
+      try {
+        const post = await createPost(this.topic.topicId, this.title, this.body);
+        console.log(post)
+        this.setPosts([post, ...this.posts])
 
-      const post = await createPost(this.topic.topicId, this.title, this.body);
-      console.log(post)
-      this.setPosts([post, ...this.posts])
+        this.body = ''
+        this.title = ''
 
-      this.body = ''
-      this.title = ''
-
-      wx.navigateBack()
+        wx.navigateBack()
+      } catch (err) {
+        this.showErr = true;
+      }
     }
   }
 };
@@ -118,7 +140,11 @@ export default {
   padding-bottom: 4px;
 }
 
-.textErr {
+.err-message  {
+  padding: 20px 0px 0px 15px;
   color: red;
 }
+
+
+
 </style>

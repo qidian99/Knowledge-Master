@@ -1,6 +1,12 @@
 <template>
   <div class="b-post-card" :style="containerStyle">
-    <div class="post-card-title">{{title}}</div>
+    <div
+      class="post-card-title"
+      @touchstart="hoverTitle = true"
+      @touchend="hoverTitle = false"
+      :class="{ active: hoverTitle && !fullview }"
+      @click="handleClick"
+    >{{title}}</div>
     <div class="post-card-divisor" />
     <div
       class="post-card-body"
@@ -10,7 +16,7 @@
       @click="handleClick"
     >{{body}}</div>
     <div class="card-time">{{time}}</div>
-    <div class="card-user">{{user}}</div>
+    <div v-if="!isMyPost" class="card-user">{{user}}</div>
     <div class="b-post-card is--meta">
       <div
         class="card-like"
@@ -35,6 +41,14 @@
         <img style="width:45rpx; height:45rpx;" src="/static/icons/comment.svg" />
       </div>
     </div>
+    <div
+      class="post-delete"
+      @touchstart="deleting = true"
+      @touchend="deleting = false"
+      @click="handleDelete"
+      :class="{ active: deleting }"
+      v-if="isMyPost"
+    >删除</div>
     <!-- <div class="post-card-other">{{likes}}</div> -->
   </div>
 </template>
@@ -63,14 +77,16 @@ export default {
     setLikesOfAPost: {
       type: Function,
       deafult: () => {}
-    }
+    },
   },
   data() {
     return {
-      hover: false,
+      hover: false, // hover body
+      hoverTitle: false,
       liking: false,
       likeArray: [],
       commenting: false,
+      deleting: false
     };
   },
   onLoad: function() {
@@ -85,6 +101,7 @@ export default {
       if (this.index && this.index !== 0) {
         return "margin-top: -5%;";
       }
+      return "";
     },
     title: function() {
       return this.post.title;
@@ -93,24 +110,30 @@ export default {
       return this.post.body;
     },
     time: function() {
-      if (moment() - this.post.createdAt < 86400000 / 6) {
-        return moment(this.post.createdAt, "x").fromNow();
+      if (this.fullview) {
+        if (moment() - this.post.createdAt < 86400000 / 6) {
+          return moment(this.post.createdAt, "x").fromNow();
+        }
+        return moment(this.post.createdAt, "x").format("YYYY/MM/DD hh:mm");
       }
-      return moment(this.post.createdAt, "x").format("YYYY/MM/DD hh:mm");
+      if (moment() - this.post.updatedAt < 86400000 / 6) {
+        return moment(this.post.updatedAt, "x").fromNow();
+      }
+      return moment(this.post.updatedAt, "x").format("YYYY/MM/DD hh:mm");
     },
     user: function() {
       const { user } = this.post;
-      console.log('checkinguser:', user)
+      console.log("checkinguser:", user);
 
       // check for local username
       if (this.userObj.userId == user.userId && this.userObj.username) {
-        return 'By ' + this.userObj.username;
+        return "By " + this.userObj.username;
       }
 
       if (user.username) {
-        return 'By ' +　user.username;
+        return "By " + user.username;
       } else if (user.nickName) {
-        return 'By ' +　user.nickName;
+        return "By " + user.nickName;
       } else {
         return `用户 ${user.openid.slice(0, 5)}****`;
       }
@@ -118,7 +141,7 @@ export default {
     likes: function() {
       return this.likeArray.length;
     },
-    comments: function () {
+    comments: function() {
       return this.post.comments.length;
     },
     doILiked: function() {
@@ -133,6 +156,9 @@ export default {
       );
       return index !== -1;
     },
+    isMyPost: function() {
+      return this.post.user.userId === this.userObj.userId;
+    }
   },
   methods: {
     handleClick: function() {
@@ -147,8 +173,11 @@ export default {
       const likes = await likeAPost(this.post.postId);
       console.log("likes", likes);
       this.likeArray = likes;
-      this.setLikesOfAPost({ postId: this.post.postId, likes })
-    }
+      this.setLikesOfAPost({ postId: this.post.postId, likes });
+    },
+    handleDelete () {
+      this.$emit("clickdelete", this.post);
+    },
   }
 };
 </script>
@@ -175,11 +204,6 @@ export default {
   font-size: 24;
 }
 
-/* .b-post-card.active { */
-.post-card-body.active {
-  background-color: rgba(0, 0, 0, 0.25);
-}
-
 .post-card-divisor {
   grid-area: div;
   width: 100%;
@@ -197,6 +221,21 @@ export default {
   text-align: left;
 }
 
+.post-delete {
+  grid-area: user;
+  place-self: center end;
+  text-align: right;
+  color: rgba(255, 0, 0, 1);
+  margin-right: 20px;
+  font-size: 14px;
+  font-weight: normal;
+  /* border: 10px solid black; */
+}
+
+.post-delete.active {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
 .post-card-body {
   grid-area: body;
   color: rgba(0, 0, 0, 0.65);
@@ -204,6 +243,13 @@ export default {
   font-size: 16px;
   font-weight: normal;
   text-align: left;
+}
+
+.post-card-title.active {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+.post-card-body.active {
+  background-color: rgba(0, 0, 0, 0.25);
 }
 
 .post-card-other {
@@ -239,11 +285,10 @@ export default {
   flex-direction: row;
   grid-area: comment;
   margin-right: 20px;
-  place-self: stretch end;
+  place-self: start end;
   font-size: 14px;
   font-weight: normal;
   color: #1296db;
-  /* border: 10px solid black; */
 }
 
 .card-comment.active {

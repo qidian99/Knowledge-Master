@@ -1,15 +1,6 @@
 import Vue from 'vue'
-// import Antd from 'ant-design-vue'
-// import 'ant-design-vue/dist/antd.css'
-// import { Button, message } from 'ant-design-vue';
+
 import 'mpvue-weui/src/style/weui.css'
-// import { Button, message } from 'ant-design-vue/lib';
-
-// import '~antd/es/style/color/colors.less'
-// import icons from '@ant-design/icons-vue';
-
-// console.log(icons)
-
 import App from './App'
 import WXrequest from './utils/request'
 import store from './store'
@@ -17,12 +8,20 @@ import store from './store'
 Vue.config.productionTip = false
 Vue.prototype.$http = WXrequest
 Vue.prototype.$store = store
+
+// 测试过 不太可用
 // Vue.use(icons)
 // Vue.component(Filter.name, Filter);
-
 // Vue.use(Button);
 // Vue.prototype.$message = message;
 // Vue.use(Antd)
+// import Antd from 'ant-design-vue'
+// import 'ant-design-vue/dist/antd.css'
+// import { Button, message } from 'ant-design-vue';
+// import { Button, message } from 'ant-design-vue/lib';
+// import '~antd/es/style/color/colors.less'
+// import icons from '@ant-design/icons-vue';
+
 
 
 // 接着，这个App.vue组件被src/main.js引入并被设置了一个mpType的属性值，其值为app。
@@ -42,7 +41,9 @@ export default {
       '^pages/topics/main',
       '^pages/newPost/main',
       '^pages/post/main',
-      '^pages/username/main'
+      '^pages/username/main',
+      '^pages/history/main',
+      '^pages/dev/main'
     ],
     window: {
       backgroundTextStyle: 'light',

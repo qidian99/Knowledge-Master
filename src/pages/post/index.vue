@@ -1,6 +1,11 @@
 <template>
   <div class="b-full-post">
-    <PostCard :fullview="true" :post="post" :setLikesOfAPost="setLikesOfAPost" />
+    <PostCard
+      :fullview="true"
+      :post="post"
+      :setLikesOfAPost="setLikesOfAPost"
+      @clickdelete="handleDelete"
+    />
     <div class="post-card-divisor" />
 
     <div class="b-comment-panel">
@@ -30,16 +35,33 @@
           :id="comment.commentId"
           :comment="comment"
           @clickcomment="handleCommentClick"
+          @clickdelete="handleCommentDelete"
         />
       </ScrollView>
     </div>
+    <modal
+      title="删除评论"
+      confirm-text="确定"
+      cancel-text="取消"
+      :hidden="commentModalHidden"
+      @confirm="commentModalConfirm"
+      @cancel="commentModalCancel"
+    >你可别后悔</modal>
+    <modal
+      title="删除帖子"
+      confirm-text="确定"
+      cancel-text="取消"
+      :hidden="modalHidden"
+      @confirm="modalConfirm"
+      @cancel="modalCancel"
+    >你可别后悔</modal>
   </div>
 </template>
 
 <script>
 import { presetPrimaryColors, grey } from "@ant-design/colors";
 import { mapGetters, mapState, mapActions } from "vuex";
-import { createComment } from "../../utils/post";
+import { createComment, deleteComment, deletePost } from "../../utils/post";
 import CommentCard from "@/components/comment-card";
 import PostCard from "@/components/post-card";
 import moment from "moment";
@@ -51,10 +73,13 @@ export default {
       btning: false,
       inputText: "",
       commentsArray: [],
+      modalHidden: true, // for post
+      commentModalHidden: true, // for comments
+      commentToDelete: null,
       mockPost: {
         postId: "5ea8cf58457e6da114a1de47",
-        title: "我是加州罗志祥",
-        body: "牛逼吧",
+        title: "生活",
+        body: "平凡且枯燥",
         createdAt: "1588121432556",
         updatedAt: "1588121432556",
         likes: 0,
@@ -111,10 +136,18 @@ export default {
   },
   methods: {
     ...mapActions("posts", {
-      setLikesOfAPost: "setLikesOfAPost"
+      setLikesOfAPost: "setLikesOfAPost",
+      setCommentsOfAPost: "setCommentsOfAPost",
+      setPosts: "setPosts"
     }),
-    ...mapActions("posts", {
-      setCommentsOfAPost: "setCommentsOfAPost"
+    ...mapActions({
+      removePost: "removePost"
+    }),
+    ...mapActions("post", {
+      addComment: "addComment"
+    }),
+    ...mapActions({
+      removeComment: "removeComment"
     }),
     handleCommentInput: function(e) {
       const {
@@ -130,14 +163,62 @@ export default {
       this.inputText = value;
     },
     replyButtonClicked: async function() {
-      console.log('comment clicked', this.inputText)
-      const c = await createComment(this.post.postId, this.inputText)
-      console.log(c)
-      const temp = [...this.commentsArray]
-      this.commentsArray = [c, ...temp]
-      this.inputText = ''
-      this.setCommentsOfAPost({ postId: this.post.postId, comments: this.commentsArray })
-
+      console.log("comment clicked", this.inputText);
+      const c = await createComment(this.post.postId, this.inputText);
+      console.log(c);
+      const temp = [...this.commentsArray];
+      this.commentsArray = [c, ...temp];
+      this.inputText = "";
+      this.setCommentsOfAPost({
+        postId: this.post.postId,
+        comments: this.commentsArray
+      });
+      this.addComment(c);
+    },
+    commentModalConfirm: async function() {
+      this.commentModalHidden = true;
+      try {
+        const res = await deleteComment(this.commentToDelete.commentId);
+        console.log("Delete res", res);
+        this.removeComment({
+          post: this.post,
+          comment: this.commentToDelete
+        });
+        const temp = [...this.commentsArray];
+        const index = temp.findIndex(
+          c => c.commentId === this.commentToDelete.commentId
+        );
+        temp.splice(index, 1);
+        this.commentsArray = temp;
+        this.commentToDelete = null;
+      } catch (err) {
+        console.log("Delete comment failed");
+      }
+    },
+    commentModalCancel: function() {
+      this.commentToDelete = null;
+      this.commentModalHidden = true;
+    },
+    handleCommentDelete: async function(comment) {
+      this.commentToDelete = comment;
+      this.commentModalHidden = false;
+    },
+    modalConfirm: async function() {
+      this.modalHidden = true;
+      try {
+        const res = await deletePost(this.post.postId);
+        console.log("Delete res", res);
+        this.removePost(this.post);
+        wx.navigateBack();
+      } catch (err) {
+        console.log("Delete post failed");
+      }
+    },
+    modalCancel: function() {
+      this.modalHidden = true;
+    },
+    handleDelete: async function(post) {
+      this.modalHidden = false;
     }
   }
 };
@@ -164,7 +245,7 @@ export default {
   grid-template-columns: 50px auto 50px;
   grid-template-rows: 40px;
   grid-template-areas: "icon input submit";
-  padding: 15px 0px 15px 0px;
+  padding: 15px 0px 40px 0px;
   background-color: #e6f7ff;
 }
 

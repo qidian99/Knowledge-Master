@@ -1,52 +1,48 @@
 <template>
   <div class="container is--grid" @click="clickHandle" :style="gridStyle">
     <div class="b-topic is--griditem" v-for="(item,index) in topics" :key="index">
-      <TopicCard :id="item.topicId" :topic="item" @clicktopic="handleClickTopic"/>
+      <TopicCard :id="item.topicId" :topic="item" @clicktopic="handleClickTopic" />
     </div>
   </div>
 </template>
 
 <script>
-import TopicCard from '@/components/topic-card'
-import { topicsQuery } from '../../utils/queries'
-import { blue } from '@ant-design/colors'
-import { mapGetters, mapState, mapActions } from "vuex"
-import { SET_USER_TOPIC, SET_USER_POST } from "../../store/mutation-types"
-import { fetchPosts } from '../../utils/post'
-import { subscribeToTopic } from '../../utils/user'
-import {
-  postsQueryWithTopic
-} from "../../utils/queries";
+import TopicCard from "@/components/topic-card";
+import { topicsQuery } from "../../utils/queries";
+import { blue } from "@ant-design/colors";
+import { mapGetters, mapState, mapActions } from "vuex";
+import { SET_USER_TOPIC, SET_USER_POST } from "../../store/mutation-types";
+import { fetchPosts } from "../../utils/post";
+import { subscribeToTopic } from "../../utils/user";
+import { postsQueryWithTopic } from "../../utils/queries";
 
 export default {
   components: { TopicCard },
-  data () {
+  data() {
     return {
       topics: []
-    }
+    };
   },
-  onLoad(){
+  onLoad() {
     wx.setNavigationBarTitle({
-      title:'选择话题',
-    })
+      title: "选择话题"
+    });
   },
   async mounted() {
-    self = this
-    console.log('Topics Mounted')
+    self = this;
+    console.log("Topics Mounted");
     const payload = {
-      query: topicsQuery,
-    }
+      query: topicsQuery
+    };
     const r = await self.$http.post({
       payload
-    })
-    
-    const {
-      data: {
-        topics
-      }
-    } = r
+    });
 
-    console.log('Topics Fetched:', topics)
+    const {
+      data: { topics }
+    } = r;
+
+    console.log("Topics Fetched:", topics);
 
     // self.topics = [...this.topics, ...topics] // for testing
     self.topics = topics;
@@ -54,7 +50,7 @@ export default {
     // self.notifyUserInfo(user)
   },
   computed: {
-    gridStyle: function () {
+    gridStyle: function() {
       // return 'background-color:' + blue[0]
     },
     ...mapState({
@@ -62,26 +58,29 @@ export default {
     }),
     ...mapGetters("topics", {
       topic: "topic"
-    }),
+    })
   },
   methods: {
     ...mapActions("topics", {
-      setUserTopic: 'setUserTopic'
+      setUserTopic: "setUserTopic"
     }),
     ...mapActions("posts", {
-      setPosts: 'setPosts'
+      setPosts: "setPosts"
     }),
-    async handleClickTopic (data) {
-      const self = this
-      console.log('>>>>', data, `topics/${SET_USER_TOPIC}`)
-      self.setUserTopic(data.topic)
-      const posts = await fetchPosts(postsQueryWithTopic, data.topic.topicId)
-      await subscribeToTopic(data.topic.topicId)
-      self.setPosts(posts)
+    async handleClickTopic(data) {
+      const self = this;
+      console.log(">>>>", data, `topics/${SET_USER_TOPIC}`);
+      self.setUserTopic(data.topic);
+      const posts = await fetchPosts(postsQueryWithTopic, data.topic.topicId);
+      await subscribeToTopic(data.topic.topicId);
+      self.setPosts(posts);
       wx.navigateBack(data)
+      wx.switchTab({
+        url: "/pages/index/main"
+      });
     }
   }
-}
+};
 </script>
 
 <style scoped>

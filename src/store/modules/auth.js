@@ -1,7 +1,7 @@
 import { SET_AUTH_TOKEN, SET_USER_PROFILE } from '../mutation-types'
 
 // initial state
-const state = {
+const initialState = {
   token: null,
   user: 'null'
 }
@@ -38,13 +38,20 @@ const mutations = {
   },
   [SET_USER_PROFILE] (state, user) {
     console.log('setting user profile', user)
-    state.user = user || {}
+    Object.keys(state.user).forEach(k => {
+      state.user[k] = user[k]
+    })
+  },
+  reset (state) {
+    console.log('auth reset')
+    state.token = initialState.token
+    state.user = initialState.user
   }
 }
 
 export default {
   namespaced: true,
-  state,
+  state: initialState,
   getters,
   actions,
   mutations

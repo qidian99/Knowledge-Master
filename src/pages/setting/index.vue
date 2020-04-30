@@ -2,16 +2,26 @@
   <div class="container">
     <SettingOption v-if="user" :src="user.avatarUrl" title="头像" />
     <div class="setting-option-divider" />
-    <SettingOption v-if="user" :text="user.nickName" title="名字"/>
+    <SettingOption v-if="user" :text="user.nickName" title="名字" />
+    <div class="setting-option-divider" />
+    <navigator class="b-nav" url="/pages/username/main" hover-class="navigator-hover">
+      <SettingOption navigation="username" title="设置昵称" :text="username" />
+    </navigator>
     <div class="setting-option-divider" />
     <navigator class="b-nav" url="/pages/topics/main" hover-class="navigator-hover">
-      <SettingOption navigation="topics" title="选择话题" :text="topic.name"/>
+      <SettingOption navigation="topics" title="选择话题" :text="topic.name" />
     </navigator>
-    <navigator class="b-nav" url="/pages/username/main" hover-class="navigator-hover">
-      <SettingOption navigation="username" title="设置昵称" :text="username"/>
+    <div class="setting-option-divider" />
+    <navigator class="b-nav" url="/pages/history/main" hover-class="navigator-hover">
+      <SettingOption navigation="history" title="浏览历史" />
     </navigator>
     <WXAuthorize @clickAuthorize="handleClick" />
-
+    <div class="clear-storage">
+      <button @click="handleClear">清空本地缓存</button>
+    </div>
+    <modal title="清空本地缓存" confirm-text="确定" cancel-text="取消" :hidden="modalHidden" @confirm="modalConfirm" @cancel="modalCancel">
+      本地历史，帖子将被删除。
+    </modal>
   </div>
 </template>
 
@@ -19,24 +29,28 @@
 import WXAuthorize from "@/components/wx-authorize";
 import { mapGetters, mapState, mapActions } from "vuex";
 import { UPDATE_USER_INFO } from "@/store/mutation-types";
-import SettingOption from '@/components/setting-option'
-import { updateUserProfile } from '../../utils/user'
+import SettingOption from "@/components/setting-option";
+import { updateUserProfile } from "../../utils/user";
+import { fetchPosts } from "../../utils/post";
+import { registerQuery, postsQueryWithTopic } from "../../utils/queries"
 
 export default {
   components: {
     WXAuthorize,
-    SettingOption
+    SettingOption,
   },
-  onLoad(){
+  onLoad() {
     wx.setNavigationBarTitle({
-      title:'设置',
-    })
+      title: "设置"
+    });
   },
   created() {
     console.log("Setting: user profile", this.user, this.profileKeys);
   },
   data() {
-    return {};
+    return {
+      modalHidden: true
+    };
   },
   computed: {
     ...mapState({
@@ -47,29 +61,99 @@ export default {
       userInfo: "user"
     }),
     ...mapGetters("topics", {
-      topic: "topic"
+      topic: "topic",
     }),
-    profileKeys: function () {
-      return Object.keys(this.user || {})
+    profileKeys: function() {
+      return Object.keys(this.user || {});
     },
-    username: function () {
-      return this.userInfo.username
+    username: function() {
+      return this.userInfo.username;
     }
   },
   methods: {
-    ...mapActions('auth', {
-      setUser: 'setUser'
+    ...mapActions("auth", {
+      setUser: "setUser",
+      setAuthToken: "setAuthToken"
     }),
-    ...mapActions('setting', {
-      updateUserInfo: 'updateUserInfo'
+    ...mapActions("posts", {
+      setPosts: "setPosts",
     }),
+    ...mapActions("topics", {
+      setUserTopic: "setUserTopic"
+    }),
+    ...mapActions({
+      clearAll: 'clearAll'
+    }),
+    ...mapActions("setting", {
+      updateUserInfo: "updateUserInfo"
+    }),
+    modalConfirm: function (e) {
+      const self = this
+      self.modalHidden = true;
+      try {
+        self.clearAll();
+        wx.login({
+          async success(res) {
+            console.log("WXAuthorize Mounted", res);
+            if (res.code) {
+              // send code to backend
+              console.log("Code", res.code);
+              self.registerOpenid(res.code);
+            }
+          }
+        });
+        // wx.clearStorageSync();
+      } catch (e) {
+        console.log(e)
+      }
+    },
+    modalCancel: function (e) {
+      this.modalHidden = true;
+    },
     async handleClick({ user }) {
       console.log("GOT USER FROM AUTHORIZE", user);
       this.updateUserInfo(user);
-      const profile = await updateUserProfile(user)
-      console.log('New profile', profile);
-      this.setUser(profile)
-    }
+      const profile = await updateUserProfile(user);
+      console.log("New profile", profile);
+      this.setUser(profile);
+    },
+    async handleClear() {
+      this.modalHidden = false;
+    },
+    async registerOpenid(code) {
+      const self = this;
+      const payload = {
+        query: registerQuery,
+        variables: {
+          code
+        }
+      };
+      const r = await self.$http.post({
+        payload
+      });
+
+      const {
+        data: {
+          registerOpenid: { user, token }
+        }
+      } = r;
+
+      console.log("Registered, token is:", token, user);
+
+      // set auth token
+      self.setAuthToken({ token, user });
+
+      if (user.subscription) {
+        // set subscription 
+        self.setUserTopic(user.subscription)
+        wx.setNavigationBarTitle({
+          title: user.subscription.name
+        });
+        console.log("Fetching all post under topic:", self.topic.name);
+        const posts = await fetchPosts(postsQueryWithTopic, self.topic.topicId);
+        self.setPosts(posts);  
+      }
+    },
   }
 };
 </script>
@@ -95,8 +179,6 @@ export default {
   width: 90%;
 }
 
-
-
 .b-nav {
   margin: 10px 15px 10px 15px;
   /* position: relative; */
@@ -104,17 +186,9 @@ export default {
   -webkit-align-items: center; */
   align-items: center;
 }
-/* .b-nav:before {
-  content: " ";
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-  height: 1px;
-  border-top: 1rpx solid #d9d9d9;
-  color: #d9d9d9;
-  left: 15px;
-} */
 
-
+.clear-storage {
+  margin: 10px, 10px, 0px;
+  padding: 5px 10px;
+}
 </style>

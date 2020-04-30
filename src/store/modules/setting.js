@@ -1,7 +1,7 @@
 import { UPDATE_USER_INFO } from '../mutation-types'
 
 // initial state
-const state = {
+const initialState = {
   items: [],
   userInfo: null
 }
@@ -26,12 +26,17 @@ const actions = {
 const mutations = {
   [UPDATE_USER_INFO] (state, userInfo) {
     state.userInfo = userInfo
+  },
+  reset (state) {
+    console.log('setting reset')
+    state.items = initialState.items
+    state.userInfo = initialState.userInfo
   }
 }
 
 export default {
   namespaced: true,
-  state,
+  state: initialState,
   getters,
   actions,
   mutations

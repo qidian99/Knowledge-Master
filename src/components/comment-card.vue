@@ -8,8 +8,15 @@
       @click="handleClick"
     >{{body}}</div>
     <div class="card-time">{{time}}</div>
-    <div class="card-user">{{user}}</div>
-    <!-- <div class="comment-card-other">{{likes}}</div> -->
+    <div v-if="!isMyComment" class="card-user">{{user}}</div>
+    <div
+      class="comment-delete"
+      @touchstart="deleting = true"
+      @touchend="deleting = false"
+      @click="handleDelete"
+      :class="{ active: deleting }"
+      v-if="isMyComment"
+    >删除</div>
   </div>
 </template>
 
@@ -29,10 +36,19 @@ export default {
       default: -1
     },
   },
+  data() {
+    return {
+      hover: false,
+      deleting: false
+    };
+  },
   onLoad: function() {
     console.log("Comment card loaded with props: ", this.comment);
   },
   computed: {
+     ...mapGetters("auth", {
+      userObj: "user"
+    }),
     body: function() {
       return this.comment.body;
     },
@@ -52,11 +68,9 @@ export default {
         return `用户 ${user.openid.slice(0, 5)}****`;
       }
     },
-  },
-  data() {
-    return {
-      hover: false,
-    };
+    isMyComment: function () {
+      return this.comment.user.userId === this.userObj.userId
+    }
   },
   methods: {
     // ...mapActions("posts", {
@@ -68,6 +82,9 @@ export default {
     },
     notifyClick() {
       this.$emit("clickcomment", this.comment);
+    },
+    handleDelete () {
+      this.$emit("clickdelete", this.comment);
     },
   }
 };
@@ -98,7 +115,7 @@ export default {
 
 /* .b-comment-card.active { */
 .comment-card-body.active {
-  background-color: rgba(0, 0, 0, 0.25);
+  /* background-color: rgba(0, 0, 0, 0.25); */
 }
 
 .comment-card-divisor {
@@ -196,4 +213,21 @@ export default {
 .card-like.active {
   background-color: rgba(0, 0, 0, 0.25);
 }
+
+
+.comment-delete {
+  grid-area: user;
+  place-self: center end;
+  text-align: right;
+  color: rgba(255, 0, 0, 1);
+  margin: 0px 20px 5px 0px;
+  font-size: 14px;
+  font-weight: normal;
+  /* border: 10px solid black; */
+}
+
+.comment-delete.active {
+  background-color: rgba(0, 0, 0, 0.25);
+}
+
 </style>

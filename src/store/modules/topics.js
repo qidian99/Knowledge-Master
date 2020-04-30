@@ -1,7 +1,7 @@
 import { SET_USER_TOPIC } from '../mutation-types'
 
 // initial state
-const state = {
+const initialState = {
   topic: ''
 }
 
@@ -26,12 +26,16 @@ const mutations = {
     state.topic = topic
 
     // update user subscription in backend
+  },
+  reset (state) {
+    console.log('topics reset')
+    state.topic = initialState.topic
   }
 }
 
 export default {
   namespaced: true,
-  state,
+  state: initialState,
   getters,
   actions,
   mutations

@@ -162,3 +162,48 @@ mutation subscribeToTopic($topicId: ID!) {
    ${UserFragment}
   }
 }`
+
+export const postQuery = `
+query post($postId: ID!) {
+  post(postId: $postId) {
+    ${PostFragment}
+  }
+}`
+
+
+export const deleteCommentMutation = `mutation deleteComment($commentId: ID!) {
+  deleteComment(commentId: $commentId)
+}`
+
+export const deletePostMutation = `mutation deletePost($postId: ID!) {
+  deletePost(postId: $postId)
+}`
+
+export const commentQuery = `query comment($commentId: ID!) {
+  comment(commentId: $commentId) {
+    commentId
+  }
+}`
+
+export const findUserPostsQuery = `query findUserPosts {
+  findUserPosts {
+      postId
+    user {
+      userId
+      username
+      nickName
+      password
+    }
+    title
+    body
+    comments {
+      commentId
+    	user {
+        userId
+      }
+      body
+      createdAt
+      updatedAt
+    }
+  }
+}`

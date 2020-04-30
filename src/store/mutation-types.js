@@ -10,12 +10,16 @@ export const SET_USER_TOPIC = 'SET_USER_TOPIC'
 // for posts page
 export const SET_USER_POST = 'SET_USER_POST'
 export const SET_REFRESH = 'SET_REFRESH'
+export const UPDATE_POST = 'UPDATE_POST'
+export const REMOVE_POST = 'REMOVE_POST'
 
 // for post page
 export const SET_HISTORY_POST = 'SET_HISTORY_POST'
 export const VIEW_POST = 'VIEW_POST'
 export const SET_LIKES_OF_A_POST = 'SET_LIKES_OF_A_POST'
 export const SET_COMMENTS_OF_A_POST = 'SET_COMMENTS_OF_A_POST'
+export const REMOVE_COMMENT = 'REMOVE_COMMENT'
+export const ADD_COMMENT = 'ADD_COMMENT'
 
 // for auth
 export const SET_AUTH_TOKEN = 'SET_AUTH_TOKEN'

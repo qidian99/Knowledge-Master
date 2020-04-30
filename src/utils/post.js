@@ -3,7 +3,10 @@ import {
   createPostMutation,
   likeAPostMutation,
   createCommentMutation,
-  setUsernameMutation
+  setUsernameMutation,
+  postQuery,
+  deletePostMutation,
+  deleteCommentMutation
 } from './queries'
 
 
@@ -27,6 +30,30 @@ export async function fetchPosts (query, topicId = null) {
   return posts
 }
 
+
+export async function fetchPost (postId) {
+  const self = this
+  const payload = {
+    query: postQuery,
+    variables: {
+      postId
+    }
+  }
+  const r = await http.post({
+    payload
+  })
+
+  const {
+    data: {
+      post
+    }
+  } = r
+
+  console.log('Fetched post', post)
+  return post
+}
+
+
 export async function createPost (topicId, title, body) {
   console.log(topicId, title, body)
   const payload = {
@@ -49,6 +76,51 @@ export async function createPost (topicId, title, body) {
 
   console.log('Created post', createPost)
   return createPost
+}
+
+
+export async function deletePost (postId) {
+  console.log('deleting post')
+  const payload = {
+    query: deletePostMutation,
+    variables: {
+      postId
+    }
+  }
+  const r = await http.post({
+    payload
+  })
+
+  const {
+    data: {
+      deletePost
+    }
+  } = r
+
+  console.log('Deleted post', deletePost)
+  return deletePost
+}
+
+export async function deleteComment (commentId) {
+  console.log('deleting comment')
+  const payload = {
+    query: deleteCommentMutation,
+    variables: {
+      commentId
+    }
+  }
+  const r = await http.post({
+    payload
+  })
+
+  const {
+    data: {
+      deleteComment
+    }
+  } = r
+
+  console.log('Deleted comment', deleteComment)
+  return deleteComment
 }
 
 

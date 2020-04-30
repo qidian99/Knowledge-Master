@@ -12,11 +12,25 @@
           :id="post.postId"
           :post="post"
           @clickpost="handlePostClick"
+          @clickdelete="handleDelete"
         />
       </div>
     </div>
     <div @click="onShowTopicClick" class="dashboard-no-topic" :style="noTopicStyle" v-else>快去选择话题吧</div>
-    <div @click="onShowTopicClick" class="dashboard-no-topic" :style="noTopicStyle" v-if="posts.length === 0">切换话题</div>
+    <div
+      @click="onShowTopicClick"
+      class="dashboard-no-topic"
+      :style="noTopicStyle"
+      v-if="posts.length === 0"
+    >切换话题</div>
+    <modal
+      title="删除帖子"
+      confirm-text="确定"
+      cancel-text="取消"
+      :hidden="modalHidden"
+      @confirm="modalConfirm"
+      @cancel="modalCancel"
+    >你可别后悔</modal>
   </div>
 </template>
 
@@ -30,7 +44,7 @@ import {
   postsQueryWithoutTopic,
   postsQueryWithTopic
 } from "../../utils/queries";
-import { fetchPosts } from "../../utils/post";
+import { fetchPosts, fetchPost, deletePost } from "../../utils/post";
 import { mapGetters, mapState, mapActions } from "vuex";
 
 import { blue } from "@ant-design/colors";
@@ -40,7 +54,9 @@ export default {
   components: { ClickCounter, UserStatus, WXAuthorize, PostCard },
   data() {
     return {
-      forceRefresh: true
+      forceRefresh: true,
+      modalHidden: true,
+      postToDelete: null
     };
   },
   async created() {
@@ -67,7 +83,7 @@ export default {
       wx.setNavigationBarTitle({
         title: this.topic.name
       });
-    } else {  
+    } else {
       wx.setNavigationBarTitle({
         title: "主页"
       });
@@ -80,10 +96,22 @@ export default {
       this.forceRefresh = false;
       setTimeout(function() {
         self.forceRefresh = true;
-        self.setRefresh(false)
+        self.setRefresh(false);
       }, 50);
     }
   },
+  async onPullDownRefresh() {
+    console.log("下拉刷新");
+    console.log("Fetching all post under topic:", self.topic.name);
+    const posts = await fetchPosts(postsQueryWithTopic, self.topic.topicId);
+    this.setPosts(posts);
+    wx.stopPullDownRefresh();
+  },
+
+  onReachBottom() {
+    console.log("上拉加载");
+  },
+
   computed: {
     noTopicStyle: function() {
       const screenHeight = wx.getSystemInfoSync().windowHeight;
@@ -106,14 +134,14 @@ export default {
     ...mapActions("posts", {
       setLikesOfAPost: "setLikesOfAPost"
     }),
-    ...mapActions("posts", {
-      setPosts: 'setPosts'
+    ...mapActions({
+      removePost: "removePost"
     }),
     ...mapActions("posts", {
-      setRefresh: 'setRefresh'
+      setPosts: "setPosts"
     }),
-    ...mapActions("post", {
-      viewPost: "viewPost"
+    ...mapActions("posts", {
+      setRefresh: "setRefresh"
     }),
     ...mapActions("topics", {
       setUserTopic: "setUserTopic"
@@ -121,12 +149,41 @@ export default {
     ...mapActions("auth", {
       setAuthToken: "setAuthToken"
     }),
-    handlePostClick(post) {
-      this.viewPost(post);
+    ...mapActions("post", {
+      viewPost: "viewPost"
+    }),
+    ...mapActions("posts", {
+      updatePost: "updatePost"
+    }),
+    async handlePostClick(post) {
+      let newPost;
 
-      wx.navigateTo({
-        url: "/pages/post/main"
-      });
+      let offlineMode = false;
+      if (!offlineMode) {
+        newPost = await fetchPost(post.postId);
+        console.log("newPost", newPost);
+        this.updatePost({ newPost, post }); // will check whether the post falls under the same category;
+        if (!newPost) {
+          // alert('帖子不存在')
+          wx.showToast({
+            title: "帖子不存在",
+            icon: "loading",
+            duration: 1200,
+            mask: true
+          });
+        } else {
+          this.viewPost(newPost);
+          wx.navigateTo({
+            url: "/pages/post/main"
+          });
+        }
+      } else {
+        // 离线浏览
+        this.viewPost(post);
+        wx.navigateTo({
+          url: "/pages/post/main"
+        });
+      }
     },
     async registerOpenid(code) {
       const self = this;
@@ -152,20 +209,39 @@ export default {
       self.setAuthToken({ token, user });
 
       if (user.subscription) {
-        // set subscription 
-        self.setUserTopic(user.subscription)
+        // set subscription
+        self.setUserTopic(user.subscription);
         wx.setNavigationBarTitle({
           title: user.subscription.name
         });
         console.log("Fetching all post under topic:", self.topic.name);
         const posts = await fetchPosts(postsQueryWithTopic, self.topic.topicId);
-        self.setPosts(posts);  
+        self.setPosts(posts);
       }
     },
     onShowTopicClick: function() {
       wx.navigateTo({
         url: "/pages/topics/main"
       });
+    },
+    modalConfirm: async function() {
+      this.modalHidden = true;
+      try {
+        const res = await deletePost(this.postToDelete.postId);
+        console.log("Delete res", res);
+        this.removePost(this.postToDelete);
+        this.postToDelete = null;
+      } catch (err) {
+        console.log("Delete post failed");
+      }
+    },
+    modalCancel: function() {
+      this.postToDelete = null;
+      this.modalHidden = true;
+    },
+    handleDelete: async function(post) {
+      this.postToDelete = post;
+      this.modalHidden = false;
     }
   }
 };

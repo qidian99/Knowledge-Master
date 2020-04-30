@@ -29,7 +29,6 @@ import { createPostMutation } from "../../utils/queries";
 import { createPost, setUsername } from "../../utils/post";
 import { blue } from "@ant-design/colors";
 import { mapGetters, mapState, mapActions } from "vuex";
-import { SET_USER_TOPIC, SET_USER_POST } from "../../store/mutation-types";
 
 const USERNAME_LIMIT = 20;
 export default {
