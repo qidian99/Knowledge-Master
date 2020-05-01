@@ -6,7 +6,13 @@
     <div class="btn">
       <button @click="handleSendMessage">测试一次性评论</button>
     </div>
-    <Uploader @upLoadSuccess="onFileUploaded" />
+    <div class="uploader">
+      <Uploader
+       @upLoadSuccess="onFileUploaded"
+       @uploadDelete="onFileDeleted" 
+       :initialFileList="gallery"
+      />
+    </div>
   </div>
 </template>
 
@@ -16,19 +22,51 @@ import HistoryCard from "@/components/history-card";
 import Uploader from "@/components/uploader";
 import { createPostMutation } from "../../utils/queries";
 import {
-  createPost,
-  setUsername,
-  fetchPost,
-  sendTemplateMessage
-} from "../../utils/post";
+  addToGallery,
+  deleteFromGallery,
+  deleteGallery
+} from "../../utils/gallery";
 import { blue } from "@ant-design/colors";
 import { mapGetters, mapState, mapActions } from "vuex";
 const COS = require("../../js/cos-wx-sdk-v5");
+const Bucket = "km-1256664426";
+const Region = "ap-beijing";
+
+// 初始化实例
+const cos = new COS({
+  getAuthorization: function(options, callback) {
+    // 异步获取签名
+    wx.request({
+      url: process.env.COS_URL, // 步骤二提供的签名接口
+      data: {
+        Method: options.Method,
+        Key: options.Key
+      },
+      dataType: "json",
+      success: function(result) {
+        var data = result.data;
+        var credentials = data && data.credentials;
+        if (!data || !credentials) return console.error("credentials invalid");
+        callback({
+          TmpSecretId: credentials.tmpSecretId,
+          TmpSecretKey: credentials.tmpSecretKey,
+          XCosSecurityToken: credentials.sessionToken,
+          StartTime: data.startTime, // 时间戳，单位秒，如：1580000000，建议返回服务器时间作为签名的开始时间，避免用户浏览器本地时间偏差过大导致签名错误
+          ExpiredTime: data.expiredTime // 时间戳，单位秒，如：1580000900
+        });
+      }
+    });
+  }
+});
 
 export default {
   components: { HistoryCard, Uploader },
   data() {
-    return {};
+    return {
+      // gallery: ["km-1256664426.cos.ap-beijing.myqcloud.com/km/wx38d854d0c185f949.o6zAJs3u9GA6D09AxYC78hOR---s.A9b4nMJb1arAa909d0bd013539a49bc8e8bc4f84effb.png",
+      // "km-1256664426.cos.ap-beijing.myqcloud.com/km/wx38d854d0c185f949.o6zAJs3u9GA6D09AxYC78hOR---s.YwsLgY0bqKF54023049ccba0c037bf2dbd4aba5e8766.png",
+      // "km-1256664426.cos.ap-beijing.myqcloud.com/km/wx38d854d0c185f949.o6zAJs3u9GA6D09AxYC78hOR---s.Ms345l1dsPlH095c19631a454d442e9c042ab70adbcb.png"].map(url => 'https://' + url),
+    };
   },
   onLoad(query) {
     wx.setNavigationBarTitle({
@@ -40,9 +78,19 @@ export default {
   computed: {
     ...mapGetters("post", {
       posts: "history"
-    })
+    }),
+    ...mapGetters("auth", {
+      token: "token",
+      user: "user"
+    }),
+    gallery: function () {
+      return (this.user.gallery || []).map(url => 'https://' + url)
+    }
   },
   methods: {
+    ...mapActions("auth", {
+      setUserGallery: "setUserGallery"
+    }),
     ...mapActions("post", {
       viewPost: "viewPost"
     }),
@@ -65,72 +113,52 @@ export default {
       await sendTemplateMessage();
     },
     async onFileUploaded(res) {
-      const host = process.env.API_BASE_URL;
+      const self = this;
+      console.log("on File Upload:", res);
 
-      var Bucket = "km-1256664426";
-      var Region = "ap-beijing";
-
-      console.log(Bucket, res);
-
-      // 初始化实例
-      var cos = new COS({
-        getAuthorization: function(options, callback) {
-          // 异步获取签名
-          wx.request({
-            url: "http://localhost:4002/sts", // 步骤二提供的签名接口
-            data: {
-              Method: options.Method,
-              Key: options.Key
-            },
-            dataType: "json",
-            success: function(result) {
-              var data = result.data;
-              var credentials = data && data.credentials;
-              if (!data || !credentials)
-                return console.error("credentials invalid");
-              callback({
-                TmpSecretId: credentials.tmpSecretId,
-                TmpSecretKey: credentials.tmpSecretKey,
-                XCosSecurityToken: credentials.sessionToken,
-                StartTime: data.startTime, // 时间戳，单位秒，如：1580000000，建议返回服务器时间作为签名的开始时间，避免用户浏览器本地时间偏差过大导致签名错误
-                ExpiredTime: data.expiredTime // 时间戳，单位秒，如：1580000900
-              });
-            }
-          });
-        }
-      });
-
-      console.log(res);
-      
-      var filePath = res.tempFiles[0].path;
+      var filePath = res[0];
       var filename = filePath.substr(filePath.lastIndexOf("/") + 1);
       cos.postObject(
         {
           Bucket: Bucket,
           Region: Region,
-          Key: filename,
+          Key: "km/" + filename,
           FilePath: filePath,
           onProgress: function(info) {
-            console.log('on progress', JSON.stringify(info));
+            console.log("on progress", JSON.stringify(info));
           }
         },
-        function(err, data) {
-          console.log('err', err || data);
+        async function(err, data) {
+          console.log("data or err", err || data);
+          if (!err && data) {
+            const gallery = await addToGallery(data.Location);
+            self.gallery = gallery;
+            self.setUserGallery(gallery)
+            console.log("GALLERY", gallery);
+          }
         }
       );
-
-      // wx.uploadFile({
-      //   url: host, //仅为示例，非真实的接口地址
-      //   filePath: tempFilePaths[0],
-      //   name: "file",
-      //   formData: {
-      //     user: "test"
-      //   },
-      //   success(res) {
-      //     const data = res.data;
-      //     //do something
-      //   }
-      // });
+    },
+    deleteGallery(filename) {
+      const self = this;
+      cos.deleteObject(
+        {
+          Bucket: Bucket /* 必须 */,
+          Region: Region /* 存储桶所在地域，必须字段 */,
+          Key: filename /* 必须 */
+        },
+        async function(err, data) {
+          console.log(err || data);
+          // const filepath = filename.substr(filename.indexOf("/") + 2)
+          const gallery = await deleteFromGallery(`${Bucket}.cos.${Region}.myqcloud.com/` + filename);
+          self.setUserGallery(gallery)
+        }
+      );
+    },
+    onFileDeleted(filePath) {
+      console.log('obj', filePath)
+      var filename = filePath.substr(filePath.lastIndexOf("/") + 1);
+      this.deleteGallery('km/' + filename)
     }
   }
 };
@@ -141,6 +169,11 @@ export default {
   background-color: transparent;
 }
 .btn {
+  margin: 10px, 10px, 0px;
+  padding: 5px 10px;
+}
+
+.uploader {
   margin: 10px, 10px, 0px;
   padding: 5px 10px;
 }

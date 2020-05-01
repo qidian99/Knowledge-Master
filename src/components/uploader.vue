@@ -3,7 +3,7 @@
 <template>
   <div class="weui-uploader">
     <div class="weui-uploader__hd" v-if="showTip">
-      <div class="weui-uploader__title">图片上传</div>
+      <div class="weui-uploader__title">{{title}}</div>
       <div class="weui-uploader__info">{{files.length}}/{{maxLength}}</div>
     </div>
     <div class="weui-uploader__bd">
@@ -39,9 +39,13 @@ export default {
     };
   },
   props: {
+    title: {
+      type: String,
+      default: '用户画廊'
+    },
     maxLength: {
       type: Number,
-      default: 20
+      default: 8
     },
     showTip: {
       type: Boolean,
@@ -49,7 +53,7 @@ export default {
     },
     count: {
       type: Number,
-      default: 9
+      default: 1
     },
     isMaxHiddenChoose: {
       type: Boolean,
@@ -72,7 +76,8 @@ export default {
             // 返回选定照片的本地文件路径列表，tempFilePath可以作为img标签的src属性显示图片
             _this.files = _this.files.concat(res.tempFilePaths);
             res.files = _this.files;
-            _this.$emit('upLoadSuccess', res);
+            // _this.$emit('upLoadSuccess', res);
+            _this.$emit('upLoadSuccess', res.tempFilePaths);
           },
           fail: function (res) {
             _this.$emit('upLoadFail', res);
@@ -109,13 +114,18 @@ export default {
           this.splice(index, 1);
         }
       };
+      console.log(e)
+      console.log(e.currentTarget)
+      console.log('deleting', this.files)
       this.files.remove(e.currentTarget.id);
-      let uploadDeleteObj = {
-        src: e.currentTarget.id,
-        index: e.currentTarget.dataset.index,
-        files: this.files
-      };
-      this.$emit('uploadDelete', uploadDeleteObj);
+      // let uploadDeleteObj = {
+      //   src: e.currentTarget.id,
+      //   index: e.currentTarget.dataset.index,
+      //   files: this.files
+      // };
+      // this.$emit('uploadDelete', uploadDeleteObj);
+      console.log('deleting2', this.files)
+      this.$emit('uploadDelete', e.currentTarget.id);
     },
     clearFiles() {
       this.files = [];

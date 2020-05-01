@@ -3,5 +3,6 @@ var prodEnv = require('./prod.env')
 
 module.exports = merge(prodEnv, {
   NODE_ENV: '"development"',
-  API_BASE_URL: '"http://localhost:4002/graphql"'
+  API_BASE_URL: '"http://localhost:4002/graphql"',
+  COS_URL: '"http://localhost:4002/sts"'
 })

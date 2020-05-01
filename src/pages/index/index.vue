@@ -24,14 +24,14 @@
       :style="noTopicStyle"
       v-if="posts.length === 0"
     >切换话题</div>
-    <modal
+    <!-- <modal
       title="删除帖子"
       confirm-text="确定"
       cancel-text="取消"
       :hidden="modalHidden"
       @confirm="modalConfirm"
       @cancel="modalCancel"
-    >你可别后悔</modal>
+    >你可别后悔</modal> -->
   </div>
 </template>
 
@@ -46,6 +46,7 @@ import {
   postsQueryWithTopic
 } from "../../utils/queries";
 import { fetchPosts, fetchPost, deletePost } from "../../utils/post";
+import { currentUser } from "../../utils/user";
 import { mapGetters, mapState, mapActions } from "vuex";
 
 import { blue } from "@ant-design/colors";
@@ -56,8 +57,6 @@ export default {
   data() {
     return {
       forceRefresh: true,
-      modalHidden: true,
-      postToDelete: null
     };
   },
   async created() {
@@ -73,11 +72,14 @@ export default {
           }
         }
       });
+      return;
     } else if (self.topic && self.topic.name.length > 0) {
       console.log("Fetching all post under topic:", self.topic.name);
       const posts = await fetchPosts(postsQueryWithTopic, self.topic.topicId);
       self.setPosts(posts);
     }
+    const user = await currentUser();
+    self.setUser(user)
   },
   onShow: function() {
     if (this.topic) {
@@ -148,7 +150,8 @@ export default {
       setUserTopic: "setUserTopic"
     }),
     ...mapActions("auth", {
-      setAuthToken: "setAuthToken"
+      setAuthToken: "setAuthToken",
+      setUser: "setUser"
     }),
     ...mapActions("post", {
       viewPost: "viewPost"
@@ -223,23 +226,35 @@ export default {
       });
     },
     modalConfirm: async function() {
-      this.modalHidden = true;
       try {
         const res = await deletePost(this.postToDelete.postId);
         console.log("Delete res", res);
         this.removePost(this.postToDelete);
-        this.postToDelete = null;
       } catch (err) {
         console.log("Delete post failed");
       }
     },
     modalCancel: function() {
-      this.postToDelete = null;
-      this.modalHidden = true;
     },
+    // handleDelete: async function(post) {
+    //   this.postToDelete = post;
+    //   this.modalHidden = false;
+    // },
     handleDelete: async function(post) {
-      this.postToDelete = post;
-      this.modalHidden = false;
+      const self = this
+      wx.showModal({
+        title: '删除帖子',
+        content: '目前不支持Archive，删除不可逆',
+        success (res) {
+          if (res.confirm) {
+            console.log('用户点击确定')
+            self.modalConfirm()
+          } else if (res.cancel) {
+            console.log('用户点击取消')
+            self.modalCancel()
+          }
+        }
+      })
     },
     handleViewUser: async function(user) {
       console.log("other user clicked", user);

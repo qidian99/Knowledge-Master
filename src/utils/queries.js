@@ -7,7 +7,8 @@ openid
 subscription {
   topicId
   name
-}`
+}
+gallery`
 
 export const registerQuery = `
 mutation registerOpenid($code: String!) {
@@ -211,3 +212,28 @@ export const findUserPostsQuery = `query findUserPosts {
 export const sendTemplateMutation = `mutation sendTemplate {
   sendTemplate
 }`
+
+export const addToGalleryMutation = `
+mutation addToGallery($filepath: String!) {
+  addToGallery(filepath: $filepath)
+}`
+
+
+export const deleteFromGalleryMutation = `
+mutation deleteFromGallery($filepath: String!) {
+  deleteFromGallery(filepath: $filepath)
+}
+`
+
+export const deleteGalleryMutation = `
+mutation deleteGallery {
+  deleteGallery
+}`
+
+export const currentUserQuery = `
+query currentUser {
+  currentUser {
+    ${UserFragment}
+  }
+}
+`

@@ -24,6 +24,7 @@ export const ADD_COMMENT = 'ADD_COMMENT'
 // for auth
 export const SET_AUTH_TOKEN = 'SET_AUTH_TOKEN'
 export const SET_USER_PROFILE = 'SET_USER_PROFILE'
+export const SET_USER_GALLERY = 'SET_USER_GALLERY'
 
 // for user
 export const SET_VIEW_OTHER_USER = 'SET_VIEW_OTHER_USER'

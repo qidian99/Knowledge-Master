@@ -1,9 +1,9 @@
-import { SET_AUTH_TOKEN, SET_USER_PROFILE } from '../mutation-types'
+import { SET_AUTH_TOKEN, SET_USER_PROFILE, SET_USER_GALLERY } from '../mutation-types'
 
 // initial state
 const initialState = {
   token: null,
-  user: 'null'
+  user: {}
 }
 
 // getters
@@ -24,8 +24,10 @@ const actions = {
     commit(SET_AUTH_TOKEN, tokenAndUser)
   },
   setUser ({ commit, state }, user) {
-    console.log('setting user profile', user)
     commit(SET_USER_PROFILE, user)
+  },
+  setUserGallery ({ commit, state }, gallery) {
+    commit(SET_USER_GALLERY, gallery)
   }
 }
 
@@ -41,6 +43,10 @@ const mutations = {
     Object.keys(state.user).forEach(k => {
       state.user[k] = user[k]
     })
+  },
+  [SET_USER_GALLERY] (state, gallery) {
+    console.log('setting user gallery', gallery)
+    state.user.gallery = gallery
   },
   reset (state) {
     console.log('auth reset')
