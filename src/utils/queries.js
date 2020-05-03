@@ -188,24 +188,7 @@ export const commentQuery = `query comment($commentId: ID!) {
 
 export const findUserPostsQuery = `query findUserPosts {
   findUserPosts {
-      postId
-    user {
-      userId
-      username
-      nickName
-      password
-    }
-    title
-    body
-    comments {
-      commentId
-    	user {
-        userId
-      }
-      body
-      createdAt
-      updatedAt
-    }
+    ${PostFragment}
   }
 }`
 

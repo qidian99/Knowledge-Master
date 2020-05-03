@@ -4,7 +4,7 @@
       <navigator class="b-edit-icon" url="/pages/newPost/main" hover-class="navigator-hover">
         <img class="edit-icon" :style="editIconStyle" src="/static/icons/edit-square-white.svg" />
       </navigator>
-      <div class="b-posts" v-for="(post,index) in posts" :key="index">
+      <div class="b-posts" v-for="(post,index) in posts" :key="index" style="transition = 'all 0.05s';">
         <PostCard
           :setLikesOfAPost="setLikesOfAPost"
           v-if="forceRefresh"
@@ -31,7 +31,7 @@
       :hidden="modalHidden"
       @confirm="modalConfirm"
       @cancel="modalCancel"
-    >你可别后悔</modal> -->
+    >你可别后悔</modal>-->
   </div>
 </template>
 
@@ -45,7 +45,12 @@ import {
   postsQueryWithoutTopic,
   postsQueryWithTopic
 } from "../../utils/queries";
-import { fetchPosts, fetchPost, deletePost } from "../../utils/post";
+import {
+  fetchPosts,
+  fetchPost,
+  deletePost,
+  clickPostAndNavigate
+} from "../../utils/post";
 import { currentUser } from "../../utils/user";
 import { mapGetters, mapState, mapActions } from "vuex";
 
@@ -56,7 +61,7 @@ export default {
   components: { ClickCounter, UserStatus, WXAuthorize, PostCard },
   data() {
     return {
-      forceRefresh: true,
+      forceRefresh: true
     };
   },
   async created() {
@@ -79,7 +84,7 @@ export default {
       self.setPosts(posts);
     }
     const user = await currentUser();
-    self.setUser(user)
+    self.setUser(user);
   },
   onShow: function() {
     if (this.topic) {
@@ -143,6 +148,9 @@ export default {
       updatePost: "updatePost",
       setLikesOfAPost: "setLikesOfAPost"
     }),
+    ...mapActions("post", {
+      viewPost: "viewPost"
+    }),
     ...mapActions("user", {
       setViewOtherUser: "setViewOtherUser"
     }),
@@ -153,38 +161,8 @@ export default {
       setAuthToken: "setAuthToken",
       setUser: "setUser"
     }),
-    ...mapActions("post", {
-      viewPost: "viewPost"
-    }),
     async handlePostClick(post) {
-      let newPost;
-
-      let offlineMode = false;
-      if (!offlineMode) {
-        newPost = await fetchPost(post.postId);
-        console.log("newPost", newPost);
-        this.updatePost({ newPost, post }); // will check whether the post falls under the same category;
-        if (!newPost) {
-          // alert('帖子不存在')
-          wx.showToast({
-            title: "帖子不存在",
-            icon: "loading",
-            duration: 1200,
-            mask: true
-          });
-        } else {
-          this.viewPost(newPost);
-          wx.navigateTo({
-            url: "/pages/post/main"
-          });
-        }
-      } else {
-        // 离线浏览
-        this.viewPost(post);
-        wx.navigateTo({
-          url: "/pages/post/main"
-        });
-      }
+      clickPostAndNavigate(this, post);
     },
     async registerOpenid(code) {
       const self = this;
@@ -225,36 +203,35 @@ export default {
         url: "/pages/topics/main"
       });
     },
-    modalConfirm: async function() {
+    modalConfirm: async function(post) {
       try {
-        const res = await deletePost(this.postToDelete.postId);
+        const res = await deletePost(post.postId);
         console.log("Delete res", res);
-        this.removePost(this.postToDelete);
+        this.removePost(post);
       } catch (err) {
         console.log("Delete post failed");
       }
     },
-    modalCancel: function() {
-    },
+    modalCancel: function() {},
     // handleDelete: async function(post) {
     //   this.postToDelete = post;
     //   this.modalHidden = false;
     // },
     handleDelete: async function(post) {
-      const self = this
+      const self = this;
       wx.showModal({
-        title: '删除帖子',
-        content: '目前不支持Archive，删除不可逆',
-        success (res) {
+        title: "删除帖子",
+        content: "目前不支持Archive，删除不可逆",
+        success(res) {
           if (res.confirm) {
-            console.log('用户点击确定')
-            self.modalConfirm()
+            console.log("用户点击确定");
+            self.modalConfirm(post);
           } else if (res.cancel) {
-            console.log('用户点击取消')
-            self.modalCancel()
+            console.log("用户点击取消");
+            self.modalCancel();
           }
         }
-      })
+      });
     },
     handleViewUser: async function(user) {
       console.log("other user clicked", user);

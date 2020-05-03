@@ -8,9 +8,9 @@
     </div>
     <div class="uploader">
       <Uploader
-       @upLoadSuccess="onFileUploaded"
-       @uploadDelete="onFileDeleted" 
-       :initialFileList="gallery"
+        @upLoadSuccess="onFileUploaded"
+        @uploadDelete="onFileDeleted"
+        :initialFileList="gallery"
       />
     </div>
   </div>
@@ -21,6 +21,7 @@
 import HistoryCard from "@/components/history-card";
 import Uploader from "@/components/uploader";
 import { createPostMutation } from "../../utils/queries";
+import { sendTemplateMessage } from "../../utils/post";
 import {
   addToGallery,
   deleteFromGallery,
@@ -61,13 +62,13 @@ const cos = new COS({
 
 export default {
   components: { HistoryCard, Uploader },
-  data() {
-    return {
-      // gallery: ["km-1256664426.cos.ap-beijing.myqcloud.com/km/wx38d854d0c185f949.o6zAJs3u9GA6D09AxYC78hOR---s.A9b4nMJb1arAa909d0bd013539a49bc8e8bc4f84effb.png",
-      // "km-1256664426.cos.ap-beijing.myqcloud.com/km/wx38d854d0c185f949.o6zAJs3u9GA6D09AxYC78hOR---s.YwsLgY0bqKF54023049ccba0c037bf2dbd4aba5e8766.png",
-      // "km-1256664426.cos.ap-beijing.myqcloud.com/km/wx38d854d0c185f949.o6zAJs3u9GA6D09AxYC78hOR---s.Ms345l1dsPlH095c19631a454d442e9c042ab70adbcb.png"].map(url => 'https://' + url),
-    };
-  },
+  // data() {
+  //   return {
+  //     gallery: ["km-1256664426.cos.ap-beijing.myqcloud.com/km/wx38d854d0c185f949.o6zAJs3u9GA6D09AxYC78hOR---s.A9b4nMJb1arAa909d0bd013539a49bc8e8bc4f84effb.png",
+  //     "km-1256664426.cos.ap-beijing.myqcloud.com/km/wx38d854d0c185f949.o6zAJs3u9GA6D09AxYC78hOR---s.YwsLgY0bqKF54023049ccba0c037bf2dbd4aba5e8766.png",
+  //     "km-1256664426.cos.ap-beijing.myqcloud.com/km/wx38d854d0c185f949.o6zAJs3u9GA6D09AxYC78hOR---s.Ms345l1dsPlH095c19631a454d442e9c042ab70adbcb.png"].map(url => 'https://' + url),
+  //   };
+  // },
   onLoad(query) {
     wx.setNavigationBarTitle({
       title: "内测功能"
@@ -83,8 +84,10 @@ export default {
       token: "token",
       user: "user"
     }),
-    gallery: function () {
-      return (this.user.gallery || []).map(url => 'https://' + url)
+    gallery: function() {
+      return ((this.user && this.user.gallery) || []).map(
+        url => "https://" + url
+      );
     }
   },
   methods: {
@@ -106,11 +109,43 @@ export default {
         ], // 此处可填写多个模板 ID，但低版本微信不兼容只能授权一个
         success(res) {
           console.log("已授权接收订阅消息");
+          wx.showModal({
+            title: "已授权订阅提醒",
+            showCancel: false,
+            success(res) {
+              if (res.confirm) {
+              } else if (res.cancel) {
+              }
+            }
+          });
         }
       });
     },
     async handleSendMessage() {
-      await sendTemplateMessage();
+      try {
+        await sendTemplateMessage();
+        console.log("已发送评论");
+        wx.showModal({
+          title: "已发送评论",
+          showCancel: false,
+          success(res) {
+            if (res.confirm) {
+            } else if (res.cancel) {
+            }
+          }
+        });
+      } catch (err) {
+        console.log("评论发送失败");
+          wx.showModal({
+            title: "评论发送失败",
+            showCancel: false,
+            success(res) {
+              if (res.confirm) {
+              } else if (res.cancel) {
+              }
+            }
+          });
+      }
     },
     async onFileUploaded(res) {
       const self = this;
@@ -133,7 +168,7 @@ export default {
           if (!err && data) {
             const gallery = await addToGallery(data.Location);
             self.gallery = gallery;
-            self.setUserGallery(gallery)
+            self.setUserGallery(gallery);
             console.log("GALLERY", gallery);
           }
         }
@@ -150,15 +185,17 @@ export default {
         async function(err, data) {
           console.log(err || data);
           // const filepath = filename.substr(filename.indexOf("/") + 2)
-          const gallery = await deleteFromGallery(`${Bucket}.cos.${Region}.myqcloud.com/` + filename);
-          self.setUserGallery(gallery)
+          const gallery = await deleteFromGallery(
+            `${Bucket}.cos.${Region}.myqcloud.com/` + filename
+          );
+          self.setUserGallery(gallery);
         }
       );
     },
     onFileDeleted(filePath) {
-      console.log('obj', filePath)
+      console.log("obj", filePath);
       var filename = filePath.substr(filePath.lastIndexOf("/") + 1);
-      this.deleteGallery('km/' + filename)
+      this.deleteGallery("km/" + filename);
     }
   }
 };

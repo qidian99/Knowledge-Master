@@ -45,11 +45,12 @@ export default {
       if (!this.src) {
         return 'padding: 15px 20px'
       } 
+      return ''
       // return 'background-color: ' + grey.primary;
     }
   },
-  data() {},
-  methods: {}
+  // data() {},
+  // methods: {}
 };
 </script>
 

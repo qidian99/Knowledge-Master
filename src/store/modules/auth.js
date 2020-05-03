@@ -3,7 +3,7 @@ import { SET_AUTH_TOKEN, SET_USER_PROFILE, SET_USER_GALLERY } from '../mutation-
 // initial state
 const initialState = {
   token: null,
-  user: {}
+  user: null
 }
 
 // getters

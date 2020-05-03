@@ -114,9 +114,9 @@ export default {
           this.splice(index, 1);
         }
       };
-      console.log(e)
-      console.log(e.currentTarget)
-      console.log('deleting', this.files)
+      // console.log(e)
+      // console.log(e.currentTarget)
+      // console.log('deleting', this.files)
       this.files.remove(e.currentTarget.id);
       // let uploadDeleteObj = {
       //   src: e.currentTarget.id,
@@ -124,7 +124,7 @@ export default {
       //   files: this.files
       // };
       // this.$emit('uploadDelete', uploadDeleteObj);
-      console.log('deleting2', this.files)
+      // console.log('deleting2', this.files)
       this.$emit('uploadDelete', e.currentTarget.id);
     },
     clearFiles() {

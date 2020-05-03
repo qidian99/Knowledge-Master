@@ -131,8 +131,6 @@ export default {
     },
     user: function() {
       const { user } = this.post;
-      console.log("checkinguser:", user);
-
       // check for local username
       if (this.userObj.userId == user.userId && this.userObj.username) {
         return "By " + this.userObj.username;
@@ -156,12 +154,6 @@ export default {
       const index = this.likeArray.findIndex(
         u => this.userObj.userId === u.userId
       );
-      console.log(
-        "computing do i like",
-        this.likeArray,
-        this.userObj.userId,
-        index
-      );
       return index !== -1;
     },
     isMyPost: function() {
@@ -170,16 +162,13 @@ export default {
   },
   methods: {
     handleClick: function() {
-      console.log("Post clicked", this.post);
       this.notifyClick();
     },
     notifyClick() {
       this.$emit("clickpost", this.post);
     },
     async onLikeClick() {
-      console.log("Like clicked");
       const likes = await likeAPost(this.post.postId);
-      console.log("likes", likes);
       this.likeArray = likes;
       this.setLikesOfAPost({ postId: this.post.postId, likes });
     },
@@ -213,6 +202,7 @@ export default {
   grid-template-areas: "like comment";
   background-color: transparent;
   font-size: 24;
+  padding-bottom: 10px;
 }
 
 .post-card-divisor {

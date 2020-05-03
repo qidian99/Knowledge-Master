@@ -313,10 +313,10 @@ export default {
 }
 
 .b-comments-scrollview {
-  z-index: 10;
-  height: auto;
+  z-index: 5;
+  height: 100%;
   /* padding: 0px 162px 0px 0px; */
   width: 100%;
-  margin: 0px 0px 120px 0px;
+  padding: 0px 0px 300px 0px;
 }
 </style>

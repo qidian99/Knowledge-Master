@@ -6,13 +6,13 @@
     :class="{ active: hover }"
     @click="handleClick"
   >
-    <div class="topic-image">
+    <!-- <div class="topic-image">
       <img
         style="width: 65rpx;height: 65rpx;"
         :src="getImgSrc"
         class="card-img"
       />
-    </div>
+    </div> -->
 
     <div>{{topic.name}}</div>
   </div>
@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     mouseDowning: function() {
-      console.log("Mouse moving");
+      // console.log("Mouse moving");
       this.hover = true;
     },
     handleClick: function() {

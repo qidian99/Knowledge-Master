@@ -19,7 +19,6 @@
 <script>
 import { presetPrimaryColors, grey } from "@ant-design/colors";
 import moment from "moment";
-console.log("grey", presetPrimaryColors);
 export default {
   props: {
     post: {
@@ -69,13 +68,7 @@ export default {
   },
   methods: {
     handleClick: function () {
-      console.log("Posts clicked");
     }
-    // notifiyTopic () {
-    //   this.$emit('clicktopic', {
-    //     topic: this.topic
-    //   })
-    // }
   }
 };
 </script>

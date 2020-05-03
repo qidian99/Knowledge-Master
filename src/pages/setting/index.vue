@@ -9,11 +9,15 @@
     </navigator>
     <div class="setting-option-divider" />
     <navigator class="b-nav" url="/pages/topics/main" hover-class="navigator-hover">
-      <SettingOption navigation="topics" title="选择话题" :text="topic.name" />
+      <SettingOption navigation="topics" title="选择版块" :text="topic.name" />
     </navigator>
     <div class="setting-option-divider" />
     <navigator class="b-nav" url="/pages/history/main" hover-class="navigator-hover">
       <SettingOption navigation="history" title="浏览历史" />
+    </navigator>
+    <div class="setting-option-divider" />
+    <navigator class="b-nav" url="/pages/myposts/main" hover-class="navigator-hover">
+      <SettingOption navigation="myposts" title="我的帖子" />
     </navigator>
     <WXAuthorize @clickAuthorize="handleClick" />
     <div class="clear-storage">
@@ -67,7 +71,10 @@ export default {
       return Object.keys(this.user || {});
     },
     username: function() {
-      return this.userInfo.username;
+      if (this.userInfo && this.userInfo.username) {
+        return this.userInfo.username
+      };
+      return ''
     }
   },
   methods: {

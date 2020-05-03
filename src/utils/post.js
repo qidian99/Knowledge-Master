@@ -7,7 +7,8 @@ import {
   postQuery,
   deletePostMutation,
   deleteCommentMutation,
-  sendTemplateMutation
+  sendTemplateMutation,
+  findUserPostsQuery
 } from './queries'
 
 
@@ -29,6 +30,25 @@ export async function fetchPosts (query, topicId = null) {
 
   console.log('Fetched posts', posts)
   return posts
+}
+
+export async function findUserPosts () {
+  const self = this
+  const payload = {
+    query: findUserPostsQuery
+  }
+  const r = await http.post({
+    payload
+  })
+
+  const {
+    data: {
+      findUserPosts
+    }
+  } = r
+
+  console.log('Fetched posts', findUserPosts)
+  return findUserPosts
 }
 
 
@@ -208,4 +228,42 @@ export async function sendTemplateMessage () {
 
   console.log('set template', sendTemplate)
   return sendTemplate
+}
+
+
+// map actions:
+// 1. viewPost
+// 2. deletePost
+// 3. updatePost
+export async function clickPostAndNavigate (self, post) {
+  let newPost
+  let offlineMode = false
+  if (!offlineMode) {
+    newPost = await fetchPost(post.postId)
+    console.log('newPost', newPost)
+    self.updatePost({ newPost, post }) // will check whether the post falls under the same category;
+    if (!newPost) {
+      // alert('帖子不存在')
+      self.removePost(post)
+      wx.showToast({
+        title: '帖子不存在',
+        icon: 'loading',
+        duration: 1200,
+        mask: true
+      })
+    } else {
+      if (self.viewPost) { // remember to refactor this
+        self.viewPost(newPost)
+        wx.navigateTo({
+          url: '/pages/post/main'
+        })
+      }
+    }
+  } else {
+    // 离线浏览
+    self.viewPost(post)
+    wx.navigateTo({
+      url: '/pages/post/main'
+    })
+  }
 }

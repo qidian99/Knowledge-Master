@@ -86,7 +86,7 @@ export default {
 <style scoped>
 .container.is--grid {
   display: grid;
-  grid-template-columns: auto;
+  grid-template-columns: 1fr 1fr;
   padding: 10px;
   /* background-color: rgba(0, 0, 0, 0.04); */
   background-color: transparent;

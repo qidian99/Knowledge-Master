@@ -43,9 +43,19 @@ export default {
     wx.setNavigationBarTitle({
       title: "设置用户名"
     });
+    this.username = this.oldUsername;
   },
   async mounted() {},
   computed: {
+    ...mapGetters("auth", {
+      user: "user"
+    }),
+    oldUsername: function () {
+      if (this.user || this.user.username) {
+        return this.user.username;
+      }
+      return ''
+    },
     submitStyle: function () {
       return "background-color:" + blue.primary;
     },

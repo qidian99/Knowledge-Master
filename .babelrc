@@ -15,8 +15,9 @@
     ],
     "stage-2"
   ],
+  "ignore": [ "./js/cos-wx-sdk-v5.js" ],
   "plugins": [
-    // "transform-runtime",
+    "transform-runtime",
     // [
     //   "import",
     //   {

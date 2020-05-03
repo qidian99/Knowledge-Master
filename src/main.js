@@ -45,8 +45,8 @@ export default {
       '^pages/username/main',
       '^pages/history/main',
       '^pages/dev/main',
-      '^pages/user/main'
-
+      '^pages/user/main',
+      '^pages/myposts/main'
     ],
     window: {
       backgroundTextStyle: 'light',

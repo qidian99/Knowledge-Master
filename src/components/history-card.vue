@@ -89,7 +89,7 @@ export default {
     },
     user: function() {
       const { user } = this.post;
-      console.log("checkinguser:", user);
+      // console.log("checkinguser:", user);
 
       // check for local username
       if (this.userObj.userId == user.userId && this.userObj.username) {
@@ -114,18 +114,11 @@ export default {
       const index = this.likeArray.findIndex(
         u => this.userObj.userId === u.userId
       );
-      console.log(
-        "computing do i like",
-        this.likeArray,
-        this.userObj.userId,
-        index
-      );
       return index !== -1;
     }
   },
   methods: {
     handleClick: function() {
-      console.log("Post clicked", this.post);
       this.notifyClick();
     },
     notifyClick() {
