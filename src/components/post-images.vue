@@ -154,6 +154,9 @@ export default {
     },
     clearFiles() {
       this.files = [];
+    },
+    setFiles(files) {
+      this.files = files;
     }
   }
 };

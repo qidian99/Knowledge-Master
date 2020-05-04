@@ -126,6 +126,7 @@ export default {
 
 .uploader {
   margin: 10px, 10px, 0px;
-  padding: 15px
+  padding: 15px;
+  /* border: 10px solid black; */
 }
 </style>

@@ -39,6 +39,7 @@
         @upLoadSuccess="onFileUploaded" 
         @uploadDelete="onFileDeleted" 
         :initialFileList="images"
+        ref="imgs"
       />
     </div>
     <div class="err-message" v-if="showErr">{{errMsg}}</div>
@@ -48,7 +49,7 @@
         :style="submitStyle"
         type="primary"
         @click="submitPost"
-        :disabled="bodyError"
+        :disabled="bodyError || uploading"
       >确定</button>
     </div>
   </div>
@@ -70,7 +71,8 @@ export default {
       showErr: false,
       BODY_LIMIT,
       files: [],
-      newImages: []
+      newImages: [],
+      uploading: false
     };
   },
   onLoad() {
@@ -78,7 +80,11 @@ export default {
       title: "编辑帖子"
     });
   },
-  async mounted() {},
+  async mounted() {
+    console.log('Edit page mounted', this.post)
+    this.$refs.imgs.setFiles(this.images);
+    self.uploading = false;
+  },
   computed: {
     ...mapState({
       topic: state => state.topics.topic
@@ -170,6 +176,7 @@ export default {
           wx.showLoading({
             title: "加载中" // loading
           });
+          self.uploading = true;
 
           await Promise.all(
             self.files.map(async (file, index) => {
@@ -186,6 +193,8 @@ export default {
                   console.log('Edited', post);
                   self.updatePost({ newPost: post, post: self.post })
                   self.editPost({})
+                  self.$refs.imgs.clearFiles();
+                  self.uploading = false;
                   wx.navigateBack();
                 }
                 return
@@ -223,6 +232,8 @@ export default {
                       console.log('Edited', post);
                       self.updatePost({ newPost: post, post: self.post })
                       self.editPost({})
+                      self.$refs.imgs.clearFiles();
+                      self.uploading = false;
                       wx.navigateBack();
                     }
                   }
@@ -235,14 +246,18 @@ export default {
             self.post.postId,
             self.title,
             self.body,
+            self.post.images.length === 0 ? null : []
           );
-          console.log('Edited', post);
+          console.log('Edited', self.files, post);
           self.updatePost({ newPost: post, post: self.post })
           self.editPost({})
+          self.$refs.imgs.clearFiles();
+          self.uploading = false;
           wx.navigateBack();
         }
       } catch (err) {
         self.showErr = true;
+        self.uploading = false;
         console.log(err);
       }
     },

@@ -45,7 +45,7 @@ export default {
     },
     maxLength: {
       type: Number,
-      default: 9
+      default: 8
     },
     showTip: {
       type: Boolean,
@@ -137,27 +137,8 @@ export default {
 <style>
 .weui-uploader__file {
   position: relative;
-  margin-right: 4vw;
-  margin-bottom: 4vw;
 }
-.weui-uploader__img {
-  display: block;
-  width: 26vw;
-  height: 26vw;
-  /* margin-right: 5vw; */
-}
-
-.weui-uploader__input-box {
-  width: 26vw;
-  height: 26vw;
-}
-
 .weui-uploader__bd {
-  overflow: hidden;
-  margin-top: -2vh;
-}
-.weui-uploader__files {
-  padding-top: 2vh;
   overflow: visible;
 }
 .delete-icon {

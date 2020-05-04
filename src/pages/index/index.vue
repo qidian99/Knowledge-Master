@@ -107,12 +107,13 @@ export default {
     const posts = store.state.posts.posts;
     const refresh = store.state.posts.refresh;
 
-    if (refresh) {
+    if (refresh) {   
       this.forceRefresh = false;
-      setTimeout(function() {
-        self.forceRefresh = true;
+      this.$nextTick(() => {
+        // Add the component back in
+        this.forceRefresh = true;
         self.setRefresh(false);
-      }, 50);
+      });
     }
   },
   async onPullDownRefresh() {
