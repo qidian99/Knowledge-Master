@@ -11,7 +11,7 @@
     <SettingOption title="ta的版块" :text="subscription" />
     <div class="setting-option-divider" />
     <SettingOption title="ta的画廊" :text="(files.length !== 0) ? '' : '未知'" />
-    <UserGallery :initialFileList="files" />
+    <UserGallery ref="imgs" :initialFileList="files" />
   </div>
 </template>
 
@@ -38,6 +38,12 @@ export default {
   },
   created() {
     console.log("View other user: ", this.user);
+  },
+  mounted() {
+    this.$refs.imgs.clearFiles();
+    this.$refs.imgs.setFiles(
+      ((this.user && this.user.gallery) || []).map(url => "https://" + url)
+    );
   },
   data() {
     return {
