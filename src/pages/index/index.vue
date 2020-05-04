@@ -15,6 +15,7 @@
           @clickdelete="handleDelete"
           @clickuser="handleViewUser"
           @clickoption="handleShowOptionSheet"
+          :thumbnailStyle="{width: '24vw', height: '24vw'}"
         />
       </div>
     </div>
@@ -34,7 +35,7 @@
       @cancel="modalCancel"
     >你可别后悔</modal>-->
   <div class="b-option-sheet" v-if="optionPost" @click="closeOptionSheet" transition="expand">
-    <OptionSheet :optionPost="optionPost" @optiondelete="handleDelete" />
+    <OptionSheet :optionPost="optionPost" @optiondelete="handleDelete" @optionedit="handleEdit" />
   </div>
   </div>
 </template>
@@ -157,6 +158,9 @@ export default {
     ...mapActions("post", {
       viewPost: "viewPost"
     }),
+    ...mapActions("edit", {
+      editPost: "editPost"
+    }),
     ...mapActions("user", {
       setViewOtherUser: "setViewOtherUser"
     }),
@@ -238,6 +242,13 @@ export default {
             self.modalCancel();
           }
         }
+      });
+    },
+    handleEdit: function(post) {
+      this.editPost(post);
+      this.optionPost = null;
+      wx.navigateTo({
+        url: "/pages/editPost/main"
       });
     },
     handleViewUser: async function(user) {

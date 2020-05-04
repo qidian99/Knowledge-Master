@@ -1,6 +1,7 @@
 import http from './request'
 import {
   createPostMutation,
+  editPostMutation,
   likeAPostMutation,
   createCommentMutation,
   setUsernameMutation,
@@ -98,6 +99,32 @@ export async function createPost (topicId, title, body, images) {
 
   console.log('Created post', createPost)
   return createPost
+}
+
+
+export async function editPost (postId, title, body, images) {
+  console.log(postId, title, body)
+  const payload = {
+    query: editPostMutation,
+    variables: {
+      postId,
+      title,
+      body,
+      images
+    }
+  }
+  const r = await http.post({
+    payload
+  })
+
+  const {
+    data: {
+      editPost
+    }
+  } = r
+
+  console.log('Edited post', editPost)
+  return editPost
 }
 
 

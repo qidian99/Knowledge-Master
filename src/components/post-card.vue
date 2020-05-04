@@ -83,6 +83,15 @@
       :class="{ active: deleting }"
       v-if="isMyPost && showDelete"
     >删除</div>
+    <div class="b-post-images" v-if="images.length !== 0">
+      <PostImages 
+        :showTip="false"
+        :showDelete="false"
+        :showAdd="false"
+        :initialFileList="images"
+        :thumbnailStyle="thumbnailStyle"
+      />
+    </div>
     <!-- <div class="post-card-other">{{likes}}</div> -->
   </div>
 </template>
@@ -90,11 +99,15 @@
 <script>
 import { presetPrimaryColors, grey } from "@ant-design/colors";
 import { likeAPost } from "../utils/post";
+import PostImages from "../components/post-images";
 import moment from "moment";
 import { mapGetters, mapState, mapActions } from "vuex";
 
 // console.log("grey", presetPrimaryColors);
 export default {
+  components: {
+    PostImages
+  },
   props: {
     post: {
       type: Object,
@@ -115,6 +128,10 @@ export default {
     showDelete: {
       type: Boolean,
       default: false
+    },
+    thumbnailStyle: {
+      type: Object,
+      default: null
     }
   },
   data() {
@@ -127,7 +144,8 @@ export default {
       deleting: false,
       clickuser: false,
       expanded: false,
-      hoverOption: false
+      hoverOption: false,
+      images: (this.post.images || []).map(url => "https://" + url)
     };
   },
   onLoad: function() {
@@ -216,7 +234,7 @@ export default {
       this.$emit("clickdelete", this.post);
     },
     handleOption() {
-      console.log('Option clicked', this.post)
+      console.log("Option clicked", this.post);
       this.$emit("clickoption", this.post);
     },
     handleViewUser() {
@@ -225,7 +243,7 @@ export default {
     handleBodyClick() {
       console.log("The body is expanding");
       this.expanded = !this.expanded;
-    },
+    }
   }
 };
 </script>
@@ -236,7 +254,13 @@ export default {
   display: grid;
   grid-template-columns: 50% 50%;
   grid-template-rows: auto;
-  grid-template-areas: "title title" "div div" "body body" "time user" "meta meta";
+  grid-template-areas:
+    "title title"
+    "div div"
+    "body body"
+    "img img"
+    "time user"
+    "meta meta";
   background-color: rgba(255, 255, 255, 0.8);
   font-size: 24;
 }
@@ -274,8 +298,16 @@ export default {
   align-items: center;
 }
 
+.post-card-options {
+  /* float: right; */
+  /* flex: 1; */
+  text-align: right;
+  /* justify-self: flex-end; */
+  /* border: 10px solid black; */
+}
+
 .post-card-title {
-  /* float: left; */
+  flex: 1;
 }
 
 .post-delete {
@@ -319,14 +351,6 @@ export default {
   font-weight: normal;
   text-align: left; */
   /* float: left; */
-}
-
-.post-card-options {
-  /* float: right; */
-  flex: 1;
-  text-align: right;
-  /* justify-self: flex-end; */
-  /* border: 10px solid black; */
 }
 
 .post-card-options.active {
@@ -435,5 +459,9 @@ export default {
   height: 0;
   padding: 0 10px;
   opacity: 0;
+}
+
+.b-post-images {
+  grid-area: img;
 }
 </style>

@@ -41,12 +41,14 @@ export default {
       '^pages/setting/main',
       '^pages/topics/main',
       '^pages/newPost/main',
+      '^pages/editPost/main',
       '^pages/post/main',
       '^pages/username/main',
       '^pages/history/main',
       '^pages/dev/main',
       '^pages/user/main',
-      '^pages/myposts/main'
+      '^pages/myposts/main',
+      "^pages/gallery/main"
     ],
     window: {
       backgroundTextStyle: 'light',

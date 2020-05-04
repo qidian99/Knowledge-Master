@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 import setting from './modules/setting'
 import topics from './modules/topics'
 import auth from './modules/auth'
+import edit from './modules/edit'
 import user from './modules/user' // view other users
 import posts from './modules/posts' // posts under topics
 import post from './modules/post' // post related to user's browsing history
@@ -20,7 +21,8 @@ export default new Vuex.Store({
     auth,
     posts,
     post,
-    user
+    user,
+    edit,
   },
   strict: debug,
   // plugins: debug ? [createLogger()] : []
@@ -43,6 +45,7 @@ export default new Vuex.Store({
       commit('setting/reset')
       commit('topics/reset')
       commit('user/reset')
+      commit('edit/reset')
     },
     removeComment ({ commit, state }, { post, comment }) {
       commit(`posts/${REMOVE_COMMENT}`, { post, comment })

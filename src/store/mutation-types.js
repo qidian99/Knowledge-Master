@@ -29,5 +29,7 @@ export const SET_USER_GALLERY = 'SET_USER_GALLERY'
 // for user
 export const SET_VIEW_OTHER_USER = 'SET_VIEW_OTHER_USER'
 
+// for edit
+export const SET_EDIT_POST = 'SET_EDIT_POST'
 
 // for other page

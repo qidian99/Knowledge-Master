@@ -35,7 +35,11 @@
       </div>
     </div>
     <div class="b-posts-images">
-      <PostImages @upLoadSuccess="onFileUploaded" @uploadDelete="onFileDeleted" />
+      <PostImages 
+        @upLoadSuccess="onFileUploaded" 
+        @uploadDelete="onFileDeleted" 
+        :initialFileList="images"
+      />
     </div>
     <div class="err-message" v-if="showErr">{{errMsg}}</div>
     <div class="weui-btn-area">
@@ -51,29 +55,27 @@
 </template>
 
 <script>
-import TopicCard from "@/components/topic-card";
 import PostImages from "@/components/post-images";
 import { createPostMutation } from "../../utils/queries";
-import { createPost } from "../../utils/post";
+import { editPost } from "../../utils/post";
 import { blue } from "@ant-design/colors";
 import { mapGetters, mapState, mapActions } from "vuex";
 import { cos, Bucket, Region } from "../../utils/cos";
 
 const BODY_LIMIT = 200;
 export default {
-  components: { TopicCard, PostImages },
+  components: { PostImages },
   data() {
     return {
       showErr: false,
-      title: "",
-      body: "",
       BODY_LIMIT,
-      files: []
+      files: [],
+      newImages: []
     };
   },
   onLoad() {
     wx.setNavigationBarTitle({
-      title: "发布帖子"
+      title: "编辑帖子"
     });
   },
   async mounted() {},
@@ -81,12 +83,24 @@ export default {
     ...mapState({
       topic: state => state.topics.topic
     }),
+    ...mapGetters("edit", {
+      post: "post"
+    }),
     ...mapGetters("topics", {
       topic: "topic"
     }),
     ...mapGetters("posts", {
       posts: "posts"
     }),
+    title: function () {
+      return this.post.title || ""
+    },
+    body: function () {
+      return this.post.body || ""
+    },
+    images: function () {
+      return (this.post.images || []).map(url => 'https://' + url)
+    },
     submitStyle: function() {
       return "background-color:" + blue.primary;
     },
@@ -120,7 +134,11 @@ export default {
       setUserTopic: "setUserTopic"
     }),
     ...mapActions("posts", {
-      setPosts: "setPosts"
+      setPosts: "setPosts",
+      updatePost: "updatePost"
+    }),
+    ...mapActions("edit", {
+      editPost: "editPost",
     }),
     handleBodyInput: function(e) {
       this.showErr = false;
@@ -144,10 +162,8 @@ export default {
       try {
         const self = this;
         if (this.files.length > 0) {
-          // await for upload to cos
-          
+          // create new array and upload new image
           const fileArray = new Array(this.files.length);
-
           let finished = 0;
           console.log("Init file arry", fileArray);
 
@@ -156,7 +172,24 @@ export default {
           });
 
           await Promise.all(
-            this.files.map(async (file, index) => {
+            self.files.map(async (file, index) => {
+              if (file.startsWith('https')) {
+                fileArray[index] = file.substr(file.indexOf("/") + 2);
+                finished += 1;
+                if (finished === fileArray.length) {
+                  const post = await editPost(
+                    self.post.postId,
+                    self.title,
+                    self.body,
+                    fileArray
+                  );
+                  console.log('Edited', post);
+                  self.updatePost({ newPost: post, post: self.post })
+                  self.editPost({})
+                  wx.navigateBack();
+                }
+                return
+              }
               var filename = file.substr(file.lastIndexOf("/") + 1);
               cos.postObject(
                 {
@@ -181,18 +214,15 @@ export default {
                     finished += 1;
                     if (finished === fileArray.length) {
                       console.log("Finish uploading file arry", fileArray);
-                      const post = await createPost(
-                        self.topic.topicId,
+                      const post = await editPost(
+                        self.post.postId,
                         self.title,
                         self.body,
                         fileArray
                       );
-                      console.log(post);
-                      self.setPosts([post, ...self.posts]);
-
-                      self.body = "";
-                      self.title = "";
-
+                      console.log('Edited', post);
+                      self.updatePost({ newPost: post, post: self.post })
+                      self.editPost({})
                       wx.navigateBack();
                     }
                   }
@@ -201,18 +231,14 @@ export default {
             })
           );
         } else {
-           const post = await createPost(
-            self.topic.topicId,
+           const post = await editPost(
+            self.post.postId,
             self.title,
             self.body,
-            []
           );
-          console.log(post);
-          self.setPosts([post, ...self.posts]);
-
-          self.body = "";
-          self.title = "";
-
+          console.log('Edited', post);
+          self.updatePost({ newPost: post, post: self.post })
+          self.editPost({})
           wx.navigateBack();
         }
       } catch (err) {

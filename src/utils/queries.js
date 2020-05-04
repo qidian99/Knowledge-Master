@@ -107,6 +107,14 @@ mutation createPost($topicId: ID! $title: String! $body: String! $images: [Strin
 }
 `
 
+export const editPostMutation = `
+mutation editPost($postId: ID! $title: String $body: String $images: [String]) {
+  editPost(postId: $postId title: $title, body: $body, images: $images) {
+    ${PostFragment}
+  }
+}
+`
+
 export const likeAPostMutation = `
 mutation likeAPost($postId: ID!) {
   likeAPost(postId: $postId) {

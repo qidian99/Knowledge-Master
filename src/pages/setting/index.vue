@@ -19,6 +19,10 @@
     <navigator class="b-nav" url="/pages/myposts/main" hover-class="navigator-hover">
       <SettingOption navigation="myposts" title="我的帖子" />
     </navigator>
+    <div class="setting-option-divider" />
+    <navigator class="b-nav" url="/pages/gallery/main" hover-class="navigator-hover">
+      <SettingOption navigation="gallery" title="我的画廊" />
+    </navigator>
     <WXAuthorize @clickAuthorize="handleClick" />
     <div class="clear-storage">
       <button @click="handleClear">清空本地缓存</button>

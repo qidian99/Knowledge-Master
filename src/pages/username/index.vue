@@ -35,7 +35,7 @@ export default {
   components: { TopicCard },
   data() {
     return {
-      username: "",
+      username: this.oldUsername || "",
       USERNAME_LIMIT,
     };
   },
@@ -43,7 +43,6 @@ export default {
     wx.setNavigationBarTitle({
       title: "设置用户名"
     });
-    this.username = this.oldUsername;
   },
   async mounted() {},
   computed: {

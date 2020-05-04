@@ -1,18 +1,16 @@
 <template>
   <div class="container">
-    <div class="btn">
-      <button @click="handleSubscription">订阅单次评论推送</button>
-    </div>
-    <div class="btn">
-      <button @click="handleSendMessage">测试一次性评论</button>
-    </div>
     <div class="uploader">
-      用户画廊已加入设置
-      <!-- <Uploader
+      <Uploader
         @upLoadSuccess="onFileUploaded"
         @uploadDelete="onFileDeleted"
         :initialFileList="gallery"
-      /> -->
+        :isMaxHiddenChoose="true"
+        title="选择要展示的图片"
+      />
+    </div>
+    <div class="weui-btn-area">
+      <button class="weui-btn" style="background-color:#1890ff" type="primary" @click="doneSettingGallery">返回</button>
     </div>
   </div>
 </template>
@@ -39,24 +37,13 @@ import {
 
 export default {
   components: { HistoryCard, Uploader },
-  // data() {
-  //   return {
-  //     gallery: ["km-1256664426.cos.ap-beijing.myqcloud.com/km/wx38d854d0c185f949.o6zAJs3u9GA6D09AxYC78hOR---s.A9b4nMJb1arAa909d0bd013539a49bc8e8bc4f84effb.png",
-  //     "km-1256664426.cos.ap-beijing.myqcloud.com/km/wx38d854d0c185f949.o6zAJs3u9GA6D09AxYC78hOR---s.YwsLgY0bqKF54023049ccba0c037bf2dbd4aba5e8766.png",
-  //     "km-1256664426.cos.ap-beijing.myqcloud.com/km/wx38d854d0c185f949.o6zAJs3u9GA6D09AxYC78hOR---s.Ms345l1dsPlH095c19631a454d442e9c042ab70adbcb.png"].map(url => 'https://' + url),
-  //   };
-  // },
   onLoad(query) {
     wx.setNavigationBarTitle({
-      title: "内测功能"
+      title: "我的画廊"
     });
-    console.log("QUERY", query.postId);
   },
   async mounted() {},
   computed: {
-    ...mapGetters("post", {
-      posts: "history"
-    }),
     ...mapGetters("auth", {
       token: "token",
       user: "user"
@@ -71,59 +58,6 @@ export default {
     ...mapActions("auth", {
       setUserGallery: "setUserGallery"
     }),
-    ...mapActions("post", {
-      viewPost: "viewPost"
-    }),
-    ...mapActions("posts", {
-      updatePost: "updatePost"
-    }),
-    handleSubscription() {
-      wx.requestSubscribeMessage({
-        tmplIds: [
-          // "2mepBLbrGHSh09Em_2cQg9HmL_A8TzyOumpBttQ7R0A",
-          "8gB9PBxb7bXmeTAGr97VAqbUFVDH8PGp5HbBaWD__eU"
-          // "Uv4JNV81SlEE4lvIGqaFaonlGY5ZofrJ36_oHwWxn74"
-        ], // 此处可填写多个模板 ID，但低版本微信不兼容只能授权一个
-        success(res) {
-          console.log("已授权接收订阅消息");
-          wx.showModal({
-            title: "已授权订阅提醒",
-            showCancel: false,
-            success(res) {
-              if (res.confirm) {
-              } else if (res.cancel) {
-              }
-            }
-          });
-        }
-      });
-    },
-    async handleSendMessage() {
-      try {
-        await sendTemplateMessage();
-        console.log("已发送评论");
-        wx.showModal({
-          title: "已发送评论",
-          showCancel: false,
-          success(res) {
-            if (res.confirm) {
-            } else if (res.cancel) {
-            }
-          }
-        });
-      } catch (err) {
-        console.log("评论发送失败");
-          wx.showModal({
-            title: "评论发送失败",
-            showCancel: false,
-            success(res) {
-              if (res.confirm) {
-              } else if (res.cancel) {
-              }
-            }
-          });
-      }
-    },
     async onFileUploaded(res) {
       const self = this;
       console.log("on File Upload:", res);
@@ -173,6 +107,9 @@ export default {
       console.log("obj", filePath);
       var filename = filePath.substr(filePath.lastIndexOf("/") + 1);
       this.deleteGallery("km/" + filename);
+    },
+    doneSettingGallery() {
+      wx.navigateBack()
     }
   }
 };
@@ -189,6 +126,6 @@ export default {
 
 .uploader {
   margin: 10px, 10px, 0px;
-  padding: 5px 10px;
+  padding: 15px
 }
 </style>

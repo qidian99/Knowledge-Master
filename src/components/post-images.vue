@@ -14,14 +14,15 @@
               mode="aspectFill"
               @click="predivImage"
               :id="item"
+              :style="imgStyle"
             />
-            <div class="delete-icon" @click="deleteImg" :id="item" :data-index="index" :key="index"></div>
+            <div class="delete-icon" v-if="showDelete" @click="deleteImg" :id="item" :data-index="index" :key="index"></div>
           </div>
         </div>
       </div>
       <div
         class="weui-uploader__input-box"
-        v-if="!isMaxHiddenChoose || (files.length < maxLength)"
+        v-if="showAdd && (!isMaxHiddenChoose || (files.length < maxLength))"
       >
         <div class="weui-uploader__input" @click="chooseImage"></div>
       </div>
@@ -31,6 +32,9 @@
 
 <script>
 export default {
+  created() {
+    console.log("Showing post images:", this.initialFileList)
+  },
   data() {
     return {
       files: this.initialFileList.slice(0, this.maxLength)
@@ -60,6 +64,31 @@ export default {
     initialFileList: {
       type: Array,
       default: () => []
+    },
+    showDelete: {
+      type: Boolean,
+      default: true
+    },
+    showAdd: {
+      type: Boolean,
+      default: true
+    },
+    thumbnailStyle: {
+      type: Object,
+      default: null
+    }
+  },
+  computed: {
+    imgStyle: function () {
+      // console.log('computing thumbnail style', this.thumbnailStyle)
+      if (this.thumbnailStyle) {
+        const {
+          width,
+          height
+        } = this.thumbnailStyle
+        return "width:" + width + ";" + "height:" + height + ";"
+      }
+      return ""
     }
   },
   methods: {
@@ -74,8 +103,8 @@ export default {
             // 返回选定照片的本地文件路径列表，tempFilePath可以作为img标签的src属性显示图片
             _this.files = _this.files.concat(res.tempFilePaths);
             res.files = _this.files;
-            // _this.$emit('upLoadSuccess', res);
-            _this.$emit('upLoadSuccess', res.tempFilePaths);
+            _this.$emit('upLoadSuccess', res);
+            // _this.$emit('upLoadSuccess', res.tempFilePaths);
           },
           fail: function (res) {
             _this.$emit('upLoadFail', res);

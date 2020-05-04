@@ -6,6 +6,7 @@
       :setLikesOfAPost="setLikesOfAPost"
       @clickdelete="handleDelete"
       @clickuser="handleViewUser"
+      @clickoption="handleShowOptionSheet"
     />
     <div class="post-card-divisor" />
 
@@ -56,7 +57,10 @@
       :hidden="modalHidden"
       @confirm="modalConfirm"
       @cancel="modalCancel"
-    >你可别后悔</modal> -->
+    >你可别后悔</modal>-->
+    <div class="b-option-sheet" v-if="optionPost" @click="closeOptionSheet" transition="expand">
+      <OptionSheet :optionPost="optionPost" @optiondelete="handleDelete" @optionedit="handleEdit" />
+    </div>
   </div>
 </template>
 
@@ -66,10 +70,11 @@ import { mapGetters, mapState, mapActions } from "vuex";
 import { createComment, deleteComment, deletePost } from "../../utils/post";
 import CommentCard from "@/components/comment-card";
 import PostCard from "@/components/post-card";
+import OptionSheet from "@/components/option-sheet";
 import moment from "moment";
 console.log("grey", presetPrimaryColors);
 export default {
-  components: { CommentCard, PostCard },
+  components: { CommentCard, PostCard, OptionSheet },
   data() {
     return {
       btning: false,
@@ -91,8 +96,9 @@ export default {
           username: null
         },
         topic: { topicId: "5ea85a2fddcdf45949b74c0d", name: "生活" },
-        block: "default"
-      }
+        block: "default",
+      },
+      optionPost: null
     };
   },
   onLoad() {
@@ -141,6 +147,9 @@ export default {
       setCommentsOfAPost: "setCommentsOfAPost",
       setPosts: "setPosts"
     }),
+    ...mapActions("edit", {
+      editPost: "editPost"
+    }),
     ...mapActions("user", {
       setViewOtherUser: "setViewOtherUser"
     }),
@@ -168,7 +177,7 @@ export default {
     },
     replyButtonClicked: async function() {
       try {
-        if (!this.replying && this.inputText !== '') {
+        if (!this.replying && this.inputText !== "") {
           this.replying = true;
           console.log("comment clicked", this.inputText);
           const c = await createComment(this.post.postId, this.inputText);
@@ -210,56 +219,70 @@ export default {
       this.commentToDelete = null;
     },
     handleCommentDelete: async function(comment) {
-      const self = this
+      const self = this;
       this.commentToDelete = comment;
       wx.showModal({
-        title: '删除评论',
-        content: '目前不支持Archive，删除不可逆',
-        success (res) {
+        title: "删除评论",
+        content: "目前不支持Archive，删除不可逆",
+        success(res) {
           if (res.confirm) {
-            console.log('用户点击确定')
-            self.commentModalConfirm()
+            console.log("用户点击确定");
+            self.commentModalConfirm();
           } else if (res.cancel) {
-            console.log('用户点击取消')
-            self.commentModalCancel()
+            console.log("用户点击取消");
+            self.commentModalCancel();
           }
         }
-      })
+      });
     },
     modalConfirm: async function() {
       try {
         const res = await deletePost(this.post.postId);
         console.log("Delete res", res);
+        this.optionPost = null;
         this.removePost(this.post);
         wx.navigateBack();
       } catch (err) {
         console.log("Delete post failed");
       }
     },
-    modalCancel: function() {
-    },
+    modalCancel: function() {},
     handleDelete: async function(post) {
-      const self = this
+      const self = this;
       wx.showModal({
-        title: '删除帖子',
-        content: '目前不支持Archive，删除不可逆',
-        success (res) {
+        title: "删除帖子",
+        content: "目前不支持Archive，删除不可逆",
+        success(res) {
           if (res.confirm) {
-            console.log('用户点击确定')
-            self.modalConfirm()
+            console.log("用户点击确定");
+            self.modalConfirm();
           } else if (res.cancel) {
-            console.log('用户点击取消')
-            self.modalCancel()
+            console.log("用户点击取消");
+            self.modalCancel();
           }
         }
-      })
+      });
+    },
+    handleEdit: function(post) {
+      this.editPost(post);
+      this.optionPost = null;
+      wx.navigateTo({
+        url: "/pages/editPost/main"
+      });
     },
     handleViewUser: async function(user) {
-      console.log("other user clicked", user)
-      this.setViewOtherUser(user)
+      console.log("other user clicked", user);
+      this.setViewOtherUser(user);
       wx.navigateTo({
         url: "/pages/user/main"
-      })
+      });
+    },
+    handleShowOptionSheet: function(optionPost) {
+      // console.log("clicking option sheet", optionPost)
+      this.optionPost = optionPost
+    },
+    closeOptionSheet: function() {
+      this.optionPost = null
     },
   }
 };
@@ -277,7 +300,7 @@ export default {
 }
 
 .b-comment-panel {
-  z-index: 100;
+  z-index: 10;
   position: fixed;
   bottom: 0px;
   box-sizing: border-box;
@@ -327,5 +350,20 @@ export default {
   /* padding: 0px 162px 0px 0px; */
   width: 100%;
   padding: 0px 0px 300px 0px;
+}
+
+
+.b-option-sheet {
+  z-index: 20;
+  position: fixed;
+  background-color: rgba(66, 66, 66, 0.6);
+  /* border: 10px solid black; */
+  width: 100vw;
+  height: 100vh;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 </style>
