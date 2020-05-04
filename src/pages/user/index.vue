@@ -9,6 +9,9 @@
     <SettingOption title="ta的昵称" :text="username" />
     <div class="setting-option-divider" />
     <SettingOption title="ta的版块" :text="subscription" />
+    <div class="setting-option-divider" />
+    <SettingOption title="ta的画廊" :text="(files.length !== 0) ? '' : '未知'" />
+    <UserGallery :initialFileList="files" />
   </div>
 </template>
 
@@ -17,14 +20,16 @@ import WXAuthorize from "@/components/wx-authorize";
 import { mapGetters, mapState, mapActions } from "vuex";
 import { UPDATE_USER_INFO } from "@/store/mutation-types";
 import SettingOption from "@/components/setting-option";
+import UserGallery from "@/components/user-gallery";
 import { updateUserProfile } from "../../utils/user";
 import { fetchPosts } from "../../utils/post";
-import { registerQuery, postsQueryWithTopic } from "../../utils/queries"
+import { registerQuery, postsQueryWithTopic } from "../../utils/queries";
 
 export default {
   components: {
     WXAuthorize,
     SettingOption,
+    UserGallery
   },
   onLoad() {
     wx.setNavigationBarTitle({
@@ -43,20 +48,24 @@ export default {
     ...mapState({
       user: state => state.user.otherUser
     }),
-    subscription: function () {
+    subscription: function() {
       if (this.user && this.user.subscription && this.user.subscription.name) {
         return this.user.subscription.name;
       } else {
-        return '未知'
+        return "未知";
       }
     },
-    username: function () {
-      if (this.user && this.user.username) return this.user.username
-      return '未知'
+    username: function() {
+      if (this.user && this.user.username) return this.user.username;
+      return "未知";
+    },
+    files: function() {
+      return ((this.user && this.user.gallery) || []).map(
+        url => "https://" + url
+      );
     }
   },
-  methods: {
-  }
+  methods: {}
 };
 </script>
 

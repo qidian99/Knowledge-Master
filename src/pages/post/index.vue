@@ -73,6 +73,7 @@ export default {
   data() {
     return {
       btning: false,
+      replying: false,
       inputText: "",
       commentsArray: [],
       commentToDelete: null,
@@ -166,17 +167,25 @@ export default {
       this.inputText = value;
     },
     replyButtonClicked: async function() {
-      console.log("comment clicked", this.inputText);
-      const c = await createComment(this.post.postId, this.inputText);
-      console.log(c);
-      const temp = [...this.commentsArray];
-      this.commentsArray = [c, ...temp];
-      this.inputText = "";
-      this.setCommentsOfAPost({
-        postId: this.post.postId,
-        comments: this.commentsArray
-      });
-      this.addComment(c);
+      try {
+        if (!this.replying && this.inputText !== '') {
+          this.replying = true;
+          console.log("comment clicked", this.inputText);
+          const c = await createComment(this.post.postId, this.inputText);
+          console.log(c);
+          const temp = [...this.commentsArray];
+          this.commentsArray = [c, ...temp];
+          this.inputText = "";
+          this.setCommentsOfAPost({
+            postId: this.post.postId,
+            comments: this.commentsArray
+          });
+          this.addComment(c);
+          this.replying = false;
+        }
+      } catch (e) {
+        this.replying = false;
+      }
     },
     commentModalConfirm: async function() {
       try {

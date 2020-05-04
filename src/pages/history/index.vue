@@ -43,6 +43,7 @@ export default {
     }),
     ...mapActions("posts", {
       setPosts: "setPosts",
+      deletePost: "deletePost",
       setRefresh: "setRefresh",
       updatePost: "updatePost",
       setLikesOfAPost: "setLikesOfAPost"

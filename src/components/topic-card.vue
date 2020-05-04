@@ -66,12 +66,13 @@ export default {
   display: flex;
   flex-direction: row;
   flex: 1;
+  opacity: 1;
   align-items: center;
   justify-content: start;
   /* background-color: rgba(255, 255, 255, 0.8); */
   border-style: inset;
   border: 1px;
-  padding: 20px 20px 20px 20px;
+  padding: 20px 20px 20px 28px;
   font-size: 28px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   text-align: center;

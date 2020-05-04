@@ -1,23 +1,50 @@
 <template>
   <div class="b-post-card" :style="containerStyle">
-    <div
-      class="post-card-title"
-      @touchstart="hoverTitle = true"
-      @touchend="hoverTitle = false"
-      :class="{ active: hoverTitle && !fullview }"
-      @click="handleClick"
-    >{{title}}</div>
+    <div class="b-post-card-title" :class="{ active: hoverTitle && !fullview }">
+      <div
+        class="post-card-title"
+        @touchstart="hoverTitle = true"
+        @touchend="hoverTitle = false"
+        @click="handleClick"
+      >{{title}}</div>
+      <div
+        v-if="!showDelete && isMyPost"
+        class="post-card-options"
+        @touchstart="hoverOption = true"
+        @touchend="hoverOption = false"
+        @click="handleOption"
+        :class="{ active: hoverOption }"
+      >
+        <img class="option-button" src="/static/icons/more.svg" />
+      </div>
+    </div>
     <div class="post-card-divisor" />
     <div
-      class="post-card-body"
+      class="b-post-card-body"
       @touchstart="hover = true"
       @touchend="hover = false"
+      transition="expand"
       :class="{ active: hover && !fullview }"
-      @click="handleClick"
-    >{{body}}</div>
+    >
+      {{shownBody}}
+      <span v-if="body.length > 50">
+        <span
+          class="post-card-body-expand"
+          v-if="!expanded"
+          transition="expand"
+          @click="handleBodyClick"
+        >...展开</span>
+        <span
+          class="post-card-body-expand"
+          v-if="expanded"
+          transition="bounce"
+          @click="handleBodyClick"
+        >...收起</span>
+      </span>
+    </div>
     <div class="card-time">{{time}}</div>
     <div
-      v-if="!isMyPost"
+      v-if="!isMyPost || !showDelete"
       @click="handleViewUser"
       @touchstart="clickuser = true"
       @touchend="clickuser = false"
@@ -54,7 +81,7 @@
       @touchend="deleting = false"
       @click="handleDelete"
       :class="{ active: deleting }"
-      v-if="isMyPost"
+      v-if="isMyPost && showDelete"
     >删除</div>
     <!-- <div class="post-card-other">{{likes}}</div> -->
   </div>
@@ -84,6 +111,10 @@ export default {
     setLikesOfAPost: {
       type: Function,
       deafult: () => {}
+    },
+    showDelete: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -94,7 +125,9 @@ export default {
       likeArray: [],
       commenting: false,
       deleting: false,
-      clickuser: false
+      clickuser: false,
+      expanded: false,
+      hoverOption: false
     };
   },
   onLoad: function() {
@@ -116,6 +149,13 @@ export default {
     },
     body: function() {
       return this.post.body;
+    },
+    shownBody: function() {
+      if (this.body.length > 50 && !this.expanded) {
+        return this.body.slice(0, 50);
+      } else {
+        return this.body;
+      }
     },
     time: function() {
       if (this.fullview) {
@@ -175,9 +215,17 @@ export default {
     handleDelete() {
       this.$emit("clickdelete", this.post);
     },
+    handleOption() {
+      console.log('Option clicked', this.post)
+      this.$emit("clickoption", this.post);
+    },
     handleViewUser() {
       this.$emit("clickuser", this.post.user);
-    }
+    },
+    handleBodyClick() {
+      console.log("The body is expanding");
+      this.expanded = !this.expanded;
+    },
   }
 };
 </script>
@@ -212,7 +260,7 @@ export default {
   border-bottom: 1px solid rgba(0, 0, 0, 0.15);
 }
 
-.post-card-title {
+.b-post-card-title {
   grid-area: title;
   color: rgba(0, 0, 0, 0.85);
   padding: 10px 20px 10px;
@@ -220,6 +268,14 @@ export default {
   font-size: 22px;
   font-weight: 500;
   text-align: left;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.post-card-title {
+  /* float: left; */
 }
 
 .post-delete {
@@ -237,16 +293,47 @@ export default {
   background-color: rgba(0, 0, 0, 0.15);
 }
 
-.post-card-body {
+.b-post-card-body {
   grid-area: body;
   color: rgba(0, 0, 0, 0.65);
   padding: 10px 20px 10px;
   font-size: 16px;
   font-weight: normal;
   text-align: left;
+  word-wrap: break-word;
+  /* border: 10px solid black; */
 }
 
-.post-card-title.active {
+.post-card-body-expand {
+  text-align: right;
+  color: #1296db;
+  font-size: 14px;
+  margin-top: 2px;
+  /* float: left; */
+}
+.post-card-body {
+  /* grid-area: body;
+  color: rgba(0, 0, 0, 0.65);
+  padding: 10px 20px 10px;
+  font-size: 16px;
+  font-weight: normal;
+  text-align: left; */
+  /* float: left; */
+}
+
+.post-card-options {
+  /* float: right; */
+  flex: 1;
+  text-align: right;
+  /* justify-self: flex-end; */
+  /* border: 10px solid black; */
+}
+
+.post-card-options.active {
+  opacity: 0.7;
+}
+
+.b-post-card-title.active {
   background-color: rgba(0, 0, 0, 0.15);
 }
 .post-card-body.active {
@@ -285,7 +372,6 @@ export default {
   opacity: 0.7;
 }
 
-
 .card-comment {
   display: flex;
   flex-direction: row;
@@ -310,6 +396,11 @@ export default {
   height: 45rpx;
 }
 
+.option-button {
+  width: 45rpx;
+  height: 45rpx;
+}
+
 .card-like {
   display: flex;
   flex-direction: row;
@@ -325,5 +416,24 @@ export default {
 
 .card-like.active {
   background-color: rgba(0, 0, 0, 0.15);
+}
+</style>
+
+<style scoped>
+/* always present */
+.expand-transition {
+  transition: all 0.3s ease;
+  height: 30px;
+  padding: 10px;
+  background-color: #eee;
+  overflow: hidden;
+}
+/* .expand-enter defines the starting state for entering */
+/* .expand-leave defines the ending state for leaving */
+.expand-enter,
+.expand-leave {
+  height: 0;
+  padding: 0 10px;
+  opacity: 0;
 }
 </style>

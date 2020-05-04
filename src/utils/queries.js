@@ -70,6 +70,7 @@ topic {
   topicId
   name
 }
+images
 block
 comments {
   user {
@@ -99,8 +100,8 @@ export const postsQueryWithoutTopic = `query posts {
 }`
 
 export const createPostMutation = `
-mutation createPost($topicId: ID! $title: String! $body: String!) {
-  createPost(topicId: $topicId title: $title, body: $body) {
+mutation createPost($topicId: ID! $title: String! $body: String! $images: [String]) {
+  createPost(topicId: $topicId title: $title, body: $body, images: $images) {
     ${PostFragment}
   }
 }

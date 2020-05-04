@@ -57,6 +57,7 @@ export default {
     }),
     ...mapActions("posts", {
       setPosts: "setPosts",
+      deletePost: "deletePost",
       setRefresh: "setRefresh",
       updatePost: "updatePost",
       setLikesOfAPost: "setLikesOfAPost"
@@ -75,7 +76,7 @@ export default {
       viewPost: "viewPost"
     }),
     async handlePostClick(post) {
-      clickPostAndNavigate(self, post)
+      clickPostAndNavigate(this, post)
     },
     modalConfirm: async function(post) {
       try {

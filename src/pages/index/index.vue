@@ -14,6 +14,7 @@
           @clickpost="handlePostClick"
           @clickdelete="handleDelete"
           @clickuser="handleViewUser"
+          @clickoption="handleShowOptionSheet"
         />
       </div>
     </div>
@@ -32,6 +33,9 @@
       @confirm="modalConfirm"
       @cancel="modalCancel"
     >你可别后悔</modal>-->
+  <div class="b-option-sheet" v-if="optionPost" @click="closeOptionSheet" transition="expand">
+    <OptionSheet :optionPost="optionPost" @optiondelete="handleDelete" />
+  </div>
   </div>
 </template>
 
@@ -40,6 +44,7 @@ import ClickCounter from "@/components/click-counter";
 import UserStatus from "@/components/user-status";
 import WXAuthorize from "@/components/wx-authorize";
 import PostCard from "@/components/post-card";
+import OptionSheet from "@/components/option-sheet";
 import {
   registerQuery,
   postsQueryWithoutTopic,
@@ -58,10 +63,11 @@ import { blue } from "@ant-design/colors";
 import store from "../../store";
 
 export default {
-  components: { ClickCounter, UserStatus, WXAuthorize, PostCard },
+  components: { ClickCounter, UserStatus, WXAuthorize, PostCard, OptionSheet },
   data() {
     return {
-      forceRefresh: true
+      forceRefresh: true,
+      optionPost: null
     };
   },
   async created() {
@@ -208,6 +214,7 @@ export default {
         const res = await deletePost(post.postId);
         console.log("Delete res", res);
         this.removePost(post);
+        this.optionPost = null;
       } catch (err) {
         console.log("Delete post failed");
       }
@@ -239,6 +246,12 @@ export default {
       wx.navigateTo({
         url: "/pages/user/main"
       });
+    },
+    handleShowOptionSheet: function(optionPost) {
+      this.optionPost = optionPost
+    },
+    closeOptionSheet: function() {
+      this.optionPost = null
     }
   }
 };
@@ -298,6 +311,19 @@ export default {
   flex: 1;
   justify-content: center;
   align-items: center;
+}
+
+.b-option-sheet {
+  position: fixed;
+  background-color: rgba(66, 66, 66, 0.6);
+  /* border: 10px solid black; */
+  width: 100vw;
+  height: 100vh;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 </style>
 
