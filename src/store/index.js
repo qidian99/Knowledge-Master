@@ -7,6 +7,7 @@ import edit from './modules/edit'
 import user from './modules/user' // view other users
 import posts from './modules/posts' // posts under topics
 import post from './modules/post' // post related to user's browsing history
+import option from './modules/option'
 import createLogger from '../plugins/logger'
 import createPersistedState from 'vuex-persistedstate'
 import { REMOVE_COMMENT, REMOVE_POST } from './mutation-types'
@@ -23,6 +24,7 @@ export default new Vuex.Store({
     post,
     user,
     edit,
+    option,
   },
   strict: debug,
   // plugins: debug ? [createLogger()] : []
@@ -31,8 +33,8 @@ export default new Vuex.Store({
       storage: {
         getItem: key => wx.getStorageSync(key),
         setItem: (key, value) => wx.setStorageSync(key, value),
-        // removeItem: key => wx.clearStorage()
-        removeItem: (key) => {}
+        removeItem: key => wx.clearStorage()
+        // removeItem: (key) => {}
       }
     })
   ],
@@ -46,6 +48,7 @@ export default new Vuex.Store({
       commit('topics/reset')
       commit('user/reset')
       commit('edit/reset')
+      commit('option/reset')
     },
     removeComment ({ commit, state }, { post, comment }) {
       commit(`posts/${REMOVE_COMMENT}`, { post, comment })

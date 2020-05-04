@@ -5,7 +5,7 @@
         :index="index"
         :id="post.postId"
         :post="post"
-        @clickhistory="handlePostClick"
+        @clickhistory="clickPostAndNavigate"
       />
     </div>
   </div>
@@ -22,7 +22,8 @@ export default {
   components: { HistoryCard },
   data() {
     return {
-      forceRefresh: true
+      forceRefresh: true,
+      clickPostAndNavigate
     };
   },
   onLoad() {
@@ -51,9 +52,6 @@ export default {
     ...mapActions("post", {
       viewPost: "viewPost"
     }),
-    async handlePostClick(post) {
-      clickPostAndNavigate(this, post)
-    }
   }
 };
 </script>

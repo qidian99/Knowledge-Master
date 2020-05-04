@@ -6,7 +6,7 @@
         :index="index"
         :id="post.postId"
         :post="post"
-        @clickpost="handlePostClick"
+        @clickpost="clickPostAndNavigate"
         @clickdelete="handleDelete"
         @clickoption="handleShowOptionSheet"
       />
@@ -25,8 +25,22 @@ import {
   postsQueryWithoutTopic,
   postsQueryWithTopic
 } from "../../utils/queries";
-import { fetchPosts, fetchPost, deletePost, findUserPosts, clickPostAndNavigate } from "../../utils/post";
-import { currentUser } from "../../utils/user";
+import {
+  findUserPosts,
+  createComment,
+  deleteComment,
+  fetchPosts,
+  fetchPost,
+  deletePost,
+  clickPostAndNavigate
+} from "../../utils/post";
+import { currentUser, handleViewUser, registerOpenid } from "../../utils/user";
+import {
+  handleDelete,
+  handleShowOptionSheet,
+  closeOptionSheet,
+  handleEdit
+} from "../../utils/option";
 import { mapGetters, mapState, mapActions } from "vuex";
 
 import { blue } from "@ant-design/colors";
@@ -36,7 +50,14 @@ export default {
   data() {
     return {
       myposts: [],
-      optionPost: null
+      clickPostAndNavigate,
+      handleDelete,
+      handleShowOptionSheet,
+      closeOptionSheet,
+      clickPostAndNavigate,
+      handleEdit,
+      handleViewUser,
+      registerOpenid
     };
   },
   onShow: async function() {
@@ -49,6 +70,9 @@ export default {
   computed: {
     ...mapGetters("topics", {
       topic: "topic"
+    }),
+    ...mapGetters("option", {
+      optionPost: "post"
     }),
     ...mapGetters("posts", {
       posts: "posts"
@@ -84,58 +108,6 @@ export default {
     ...mapActions("post", {
       viewPost: "viewPost"
     }),
-    async handlePostClick(post) {
-      clickPostAndNavigate(this, post)
-    },
-    modalConfirm: async function() {
-      try {
-        const res = await deletePost(this.post.postId);
-        console.log("Delete res", res);
-        this.optionPost = null;
-        this.removePost(this.post);
-        wx.navigateBack();
-      } catch (err) {
-        console.log("Delete post failed");
-      }
-    },
-    modalCancel: function() {},
-    handleDelete: async function(post) {
-      const self = this;
-      wx.showModal({
-        title: "删除帖子",
-        content: "目前不支持Archive，删除不可逆",
-        success(res) {
-          if (res.confirm) {
-            console.log("用户点击确定");
-            self.modalConfirm();
-          } else if (res.cancel) {
-            console.log("用户点击取消");
-            self.modalCancel();
-          }
-        }
-      });
-    },
-    handleEdit: function(post) {
-      this.editPost(post);
-      this.optionPost = null;
-      wx.navigateTo({
-        url: "/pages/editPost/main"
-      });
-    },
-    handleViewUser: async function(user) {
-      console.log("other user clicked", user);
-      this.setViewOtherUser(user);
-      wx.navigateTo({
-        url: "/pages/user/main"
-      });
-    },
-    handleShowOptionSheet: function(optionPost) {
-      // console.log("clicking option sheet", this.optionPost)
-      this.optionPost = optionPost
-    },
-    closeOptionSheet: function() {
-      this.optionPost = null
-    },
   }
 };
 

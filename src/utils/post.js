@@ -11,6 +11,7 @@ import {
   sendTemplateMutation,
   findUserPostsQuery
 } from './queries'
+import store from '../store'
 
 
 export async function fetchPosts (query, topicId = null) {
@@ -259,24 +260,35 @@ export async function sendTemplateMessage () {
 }
 
 
+const removePost = (post) => {
+  store.dispatch('removePost', post)
+}
+
+const updatePost = ({ newPost, post }) => {
+  store.dispatch('posts/updatePost', { newPost, post })
+}
+
+const viewPost = (post) => {
+  store.dispatch('post/viewPost', post)
+}
 // map actions:
 // 1. viewPost
 // 2. deletePost
 // 3. updatePost
-export async function clickPostAndNavigate (self, post) {
+export async function clickPostAndNavigate (post) {
   try {
     let newPost
     let offlineMode = false
     if (!offlineMode) {
       newPost = await fetchPost(post.postId)
       // console.log('newPost', newPost)
-      self.updatePost({ newPost, post }) // will check whether the post falls under the same category;
+      updatePost({ newPost, post }) // will check whether the post falls under the same category;
       console.log('post updated', newPost)
 
       if (!newPost) {
         // alert('帖子不存在')
         // console.log('No post available')
-        self.removePost(post)
+        removePost(post)
         wx.showToast({
           title: '帖子不存在',
           icon: 'loading',
@@ -285,21 +297,14 @@ export async function clickPostAndNavigate (self, post) {
         })
       } else {
         // console.log('Navigating')
-        if (self.viewPost) { // remember to refactor this
-          self.viewPost(newPost)
-          wx.navigateTo({
-            url: '/pages/post/main'
-          })
-        } else {
-          // console.log('No self.viewPost method available')
-          wx.navigateTo({
-            url: '/pages/post/main'
-          })
-        }
+        viewPost(newPost)
+        wx.navigateTo({
+          url: '/pages/post/main'
+        })
       }
     } else {
       // 离线浏览
-      self.viewPost(post)
+      viewPost(post)
       wx.navigateTo({
         url: '/pages/post/main'
       })

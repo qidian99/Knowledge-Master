@@ -67,7 +67,21 @@
 <script>
 import { presetPrimaryColors, grey } from "@ant-design/colors";
 import { mapGetters, mapState, mapActions } from "vuex";
-import { createComment, deleteComment, deletePost } from "../../utils/post";
+import {
+  createComment,
+  deleteComment,
+  fetchPosts,
+  fetchPost,
+  deletePost,
+  clickPostAndNavigate
+} from "../../utils/post";
+import { currentUser, handleViewUser, registerOpenid } from "../../utils/user";
+import {
+  handleDelete,
+  handleShowOptionSheet,
+  closeOptionSheet,
+  handleEdit
+} from "../../utils/option";
 import CommentCard from "@/components/comment-card";
 import PostCard from "@/components/post-card";
 import OptionSheet from "@/components/option-sheet";
@@ -82,24 +96,15 @@ export default {
       inputText: "",
       commentsArray: [],
       commentToDelete: null,
-      mockPost: {
-        postId: "5ea8cf58457e6da114a1de47",
-        title: "生活",
-        body: "平凡且枯燥",
-        createdAt: "1588121432556",
-        updatedAt: "1588121432556",
-        likes: 0,
-        hide: false,
-        user: {
-          userId: "5ea847253a89ea55c16105ec",
-          openid: "otVZc5QIASQCvzmje10-fn2EBC50",
-          username: null
-        },
-        topic: { topicId: "5ea85a2fddcdf45949b74c0d", name: "生活" },
-        block: "default",
-      },
-      optionPost: null,
-      forceRefresh: true
+      forceRefresh: true,
+      // util import
+      handleDelete: (post) => handleDelete(post, () => { wx.navigateBack() }),
+      handleShowOptionSheet,
+      closeOptionSheet,
+      clickPostAndNavigate,
+      handleEdit,
+      handleViewUser,
+      registerOpenid
     };
   },
   onLoad() {
@@ -111,7 +116,7 @@ export default {
   },
   onShow() {
     const temp = this.posts.find(p => p.postId === this.post.postId);
-    this.setImages(temp.images)
+    this.setImages(temp.images);
   },
   computed: {
     ...mapGetters("post", {
@@ -119,6 +124,9 @@ export default {
     }),
     ...mapGetters("posts", {
       posts: "posts"
+    }),
+    ...mapGetters("option", {
+      optionPost: "post"
     }),
     title: function() {
       return this.post.title;
@@ -156,7 +164,7 @@ export default {
       setPosts: "setPosts"
     }),
     ...mapActions("edit", {
-      editPost: "editPost",
+      editPost: "editPost"
     }),
     ...mapActions("user", {
       setViewOtherUser: "setViewOtherUser"
@@ -166,7 +174,7 @@ export default {
     }),
     ...mapActions("post", {
       addComment: "addComment",
-      setImages: "setImages",
+      setImages: "setImages"
     }),
     ...mapActions({
       removeComment: "removeComment"
@@ -224,9 +232,6 @@ export default {
         console.log("Delete comment failed");
       }
     },
-    commentModalCancel: function() {
-      this.commentToDelete = null;
-    },
     handleCommentDelete: async function(comment) {
       const self = this;
       this.commentToDelete = comment;
@@ -243,55 +248,6 @@ export default {
           }
         }
       });
-    },
-    modalConfirm: async function() {
-      try {
-        const res = await deletePost(this.post.postId);
-        console.log("Delete res", res);
-        this.optionPost = null;
-        this.removePost(this.post);
-        wx.navigateBack();
-      } catch (err) {
-        console.log("Delete post failed");
-      }
-    },
-    modalCancel: function() {},
-    handleDelete: async function(post) {
-      const self = this;
-      wx.showModal({
-        title: "删除帖子",
-        content: "目前不支持Archive，删除不可逆",
-        success(res) {
-          if (res.confirm) {
-            console.log("用户点击确定");
-            self.modalConfirm();
-          } else if (res.cancel) {
-            console.log("用户点击取消");
-            self.modalCancel();
-          }
-        }
-      });
-    },
-    handleEdit: function(post) {
-      this.editPost(post);
-      this.optionPost = null;
-      wx.navigateTo({
-        url: "/pages/editPost/main"
-      });
-    },
-    handleViewUser: async function(user) {
-      console.log("other user clicked", user);
-      this.setViewOtherUser(user);
-      wx.navigateTo({
-        url: "/pages/user/main"
-      });
-    },
-    handleShowOptionSheet: function(optionPost) {
-      // console.log("clicking option sheet", optionPost)
-      this.optionPost = optionPost
-    },
-    closeOptionSheet: function() {
-      this.optionPost = null
     },
   }
 };
@@ -360,7 +316,6 @@ export default {
   width: 100%;
   padding: 0px 0px 300px 0px;
 }
-
 
 .b-option-sheet {
   z-index: 20;

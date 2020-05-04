@@ -16,7 +16,7 @@
           :index="index"
           :id="post.postId"
           :post="post"
-          @clickpost="handlePostClick"
+          @clickpost="clickPostAndNavigate"
           @clickdelete="handleDelete"
           @clickuser="handleViewUser"
           @clickoption="handleShowOptionSheet"
@@ -52,8 +52,6 @@ import WXAuthorize from "@/components/wx-authorize";
 import PostCard from "@/components/post-card";
 import OptionSheet from "@/components/option-sheet";
 import {
-  registerQuery,
-  postsQueryWithoutTopic,
   postsQueryWithTopic
 } from "../../utils/queries";
 import {
@@ -62,7 +60,13 @@ import {
   deletePost,
   clickPostAndNavigate
 } from "../../utils/post";
-import { currentUser } from "../../utils/user";
+import { currentUser, handleViewUser, registerOpenid } from "../../utils/user";
+import {
+  handleDelete,
+  handleShowOptionSheet,
+  closeOptionSheet,
+  handleEdit
+} from "../../utils/option";
 import { mapGetters, mapState, mapActions } from "vuex";
 
 import { blue } from "@ant-design/colors";
@@ -73,7 +77,13 @@ export default {
   data() {
     return {
       forceRefresh: true,
-      optionPost: null
+      handleDelete,
+      handleShowOptionSheet,
+      closeOptionSheet,
+      clickPostAndNavigate,
+      handleEdit,
+      handleViewUser,
+      registerOpenid
     };
   },
   async created() {
@@ -153,28 +163,18 @@ export default {
     ...mapGetters("posts", {
       posts: "posts"
     }),
+    ...mapGetters("option", {
+      optionPost: "post"
+    }),
     ...mapGetters("auth", {
       token: "token"
     })
   },
   methods: {
-    ...mapActions({
-      removePost: "removePost"
-    }),
     ...mapActions("posts", {
       setPosts: "setPosts",
       setRefresh: "setRefresh",
-      updatePost: "updatePost",
       setLikesOfAPost: "setLikesOfAPost"
-    }),
-    ...mapActions("post", {
-      viewPost: "viewPost"
-    }),
-    ...mapActions("edit", {
-      editPost: "editPost"
-    }),
-    ...mapActions("user", {
-      setViewOtherUser: "setViewOtherUser"
     }),
     ...mapActions("topics", {
       setUserTopic: "setUserTopic"
@@ -183,98 +183,8 @@ export default {
       setAuthToken: "setAuthToken",
       setUser: "setUser"
     }),
-    async handlePostClick(post) {
-      clickPostAndNavigate(this, post);
-    },
-    async registerOpenid(code) {
-      const self = this;
-      const payload = {
-        query: registerQuery,
-        variables: {
-          code
-        }
-      };
-      const r = await self.$http.post({
-        payload
-      });
-
-      const {
-        data: {
-          registerOpenid: { user, token }
-        }
-      } = r;
-
-      console.log("Registered, token is:", token, user);
-
-      // set auth token
-      self.setAuthToken({ token, user });
-
-      if (user.subscription) {
-        // set subscription
-        self.setUserTopic(user.subscription);
-        wx.setNavigationBarTitle({
-          title: user.subscription.name
-        });
-        console.log("Fetching all post under topic:", self.topic.name);
-        const posts = await fetchPosts(postsQueryWithTopic, self.topic.topicId);
-        self.setPosts(posts);
-      }
-    },
     onShowTopicClick: function() {
-      wx.navigateTo({
-        url: "/pages/topics/main"
-      });
-    },
-    modalConfirm: async function(post) {
-      try {
-        const res = await deletePost(post.postId);
-        console.log("Delete res", res);
-        this.removePost(post);
-        this.optionPost = null;
-      } catch (err) {
-        console.log("Delete post failed");
-      }
-    },
-    modalCancel: function() {},
-    // handleDelete: async function(post) {
-    //   this.postToDelete = post;
-    //   this.modalHidden = false;
-    // },
-    handleDelete: async function(post) {
-      const self = this;
-      wx.showModal({
-        title: "删除帖子",
-        content: "目前不支持Archive，删除不可逆",
-        success(res) {
-          if (res.confirm) {
-            console.log("用户点击确定");
-            self.modalConfirm(post);
-          } else if (res.cancel) {
-            console.log("用户点击取消");
-            self.modalCancel();
-          }
-        }
-      });
-    },
-    handleEdit: function(post) {
-      this.editPost(post);
-      this.optionPost = null;
-      wx.navigateTo({
-        url: "/pages/editPost/main"
-      });
-    },
-    handleViewUser: async function(user) {
-      console.log("other user clicked", user);
-      this.setViewOtherUser(user);
-      wx.navigateTo({
-        url: "/pages/user/main"
-      });
-    },
-    handleShowOptionSheet: function(optionPost) {
-      this.optionPost = optionPost;
-    },
-    closeOptionSheet: function() {
-      this.optionPost = null;
+      wx.navigateTo({url: "/pages/topics/main"});
     }
   }
 };
