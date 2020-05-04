@@ -65,6 +65,7 @@ const mutations = {
   },
   [SET_USER_POST] (state, posts) {
     console.log('In set user posts:', posts)
+    state.posts = initialState.posts
     state.posts = posts
   },
   [SET_LIKES_OF_A_POST] (state, { postId, likes }) {

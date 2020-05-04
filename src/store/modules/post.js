@@ -1,4 +1,7 @@
-import { SET_HISTORY_POST, VIEW_POST, REMOVE_POST, SET_LIKES_OF_A_POST, REMOVE_COMMENT, ADD_COMMENT } from '../mutation-types'
+import {
+  SET_IMAGES, SET_HISTORY_POST,
+  VIEW_POST, REMOVE_POST, SET_LIKES_OF_A_POST, REMOVE_COMMENT, ADD_COMMENT
+} from '../mutation-types'
 import moment from 'moment'
 import { deepCopy } from '../../utils'
 // initial state
@@ -20,32 +23,35 @@ const getters = {
 
 // actions
 const actions = {
-  viewPost ({ commit, state }, post) {
+  viewPost({ commit, state }, post) {
     commit(VIEW_POST, post)
     commit(SET_HISTORY_POST, post)
   },
-  addComment ({ commit, state }, comment) {
+  addComment({ commit, state }, comment) {
     commit(ADD_COMMENT, comment)
-  }
+  },
+  setImages({ commit, state }, images) {
+    commit(SET_IMAGES, images)
+  },
 }
 
 // mutations
 const mutations = {
-  [VIEW_POST] (state, post) {
+  [VIEW_POST](state, post) {
     console.log('In view post:', post)
     state.post = post
   },
-  [SET_HISTORY_POST] (state, post) {
+  [SET_HISTORY_POST](state, post) {
     const temp = [...state.history]
     const found = temp.findIndex((p) => p.postId === post.postId)
     if (found !== -1) {
       temp.splice(found, 1)
     }
-    temp.unshift({...post, timestamp: moment()})
+    temp.unshift({ ...post, timestamp: moment() })
     console.log('In set history post:', temp)
     state.history = temp
   },
-  [REMOVE_COMMENT] (state, { post, comment }) {
+  [REMOVE_COMMENT](state, { post, comment }) {
     const {
       postId
     } = post
@@ -62,10 +68,13 @@ const mutations = {
     }
     state.post.comments = tempComments
   },
-  [ADD_COMMENT] (state, comment) {
+  [ADD_COMMENT](state, comment) {
     state.post.comments.unshift(comment)
   },
-  [REMOVE_POST] (state, post) {
+  [SET_IMAGES](state, images) {
+    state.post.images = images
+  },
+  [REMOVE_POST](state, post) {
     const {
       postId
     } = post
@@ -80,7 +89,7 @@ const mutations = {
       state.history.splice(index, 1)
     }
   },
-  reset (state) {
+  reset(state) {
     console.log('post reset')
     state.post = initialState.post
     state.history = initialState.history

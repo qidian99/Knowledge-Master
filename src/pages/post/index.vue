@@ -1,5 +1,5 @@
 <template>
-  <div class="b-full-post">
+  <div class="b-full-post" v-if="forceRefresh">
     <PostCard
       :fullview="true"
       :post="post"
@@ -98,7 +98,8 @@ export default {
         topic: { topicId: "5ea85a2fddcdf45949b74c0d", name: "生活" },
         block: "default",
       },
-      optionPost: null
+      optionPost: null,
+      forceRefresh: true
     };
   },
   onLoad() {
@@ -108,9 +109,16 @@ export default {
     console.log("浏览帖子", this.post);
     this.commentsArray = this.comments;
   },
+  onShow() {
+    const temp = this.posts.find(p => p.postId === this.post.postId);
+    this.setImages(temp.images)
+  },
   computed: {
     ...mapGetters("post", {
       post: "post"
+    }),
+    ...mapGetters("posts", {
+      posts: "posts"
     }),
     title: function() {
       return this.post.title;
@@ -148,7 +156,7 @@ export default {
       setPosts: "setPosts"
     }),
     ...mapActions("edit", {
-      editPost: "editPost"
+      editPost: "editPost",
     }),
     ...mapActions("user", {
       setViewOtherUser: "setViewOtherUser"
@@ -157,7 +165,8 @@ export default {
       removePost: "removePost"
     }),
     ...mapActions("post", {
-      addComment: "addComment"
+      addComment: "addComment",
+      setImages: "setImages",
     }),
     ...mapActions({
       removeComment: "removeComment"

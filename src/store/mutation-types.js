@@ -20,6 +20,7 @@ export const SET_LIKES_OF_A_POST = 'SET_LIKES_OF_A_POST'
 export const SET_COMMENTS_OF_A_POST = 'SET_COMMENTS_OF_A_POST'
 export const REMOVE_COMMENT = 'REMOVE_COMMENT'
 export const ADD_COMMENT = 'ADD_COMMENT'
+export const SET_IMAGES = 'SET_IMAGES'
 
 // for auth
 export const SET_AUTH_TOKEN = 'SET_AUTH_TOKEN'

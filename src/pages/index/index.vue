@@ -4,7 +4,12 @@
       <navigator class="b-edit-icon" url="/pages/newPost/main" hover-class="navigator-hover">
         <img class="edit-icon" :style="editIconStyle" src="/static/icons/edit-square-white.svg" />
       </navigator>
-      <div class="b-posts" v-for="(post,index) in posts" :key="index" style="transition = 'all 0.05s';">
+      <div
+        class="b-posts"
+        v-for="(post,index) in posts"
+        :key="index"
+        style="transition = 'all 0.05s';"
+      >
         <PostCard
           :setLikesOfAPost="setLikesOfAPost"
           v-if="forceRefresh"
@@ -34,9 +39,9 @@
       @confirm="modalConfirm"
       @cancel="modalCancel"
     >你可别后悔</modal>-->
-  <div class="b-option-sheet" v-if="optionPost" @click="closeOptionSheet" transition="expand">
-    <OptionSheet :optionPost="optionPost" @optiondelete="handleDelete" @optionedit="handleEdit" />
-  </div>
+    <div class="b-option-sheet" v-if="optionPost" @click="closeOptionSheet" transition="expand">
+      <OptionSheet :optionPost="optionPost" @optiondelete="handleDelete" @optionedit="handleEdit" />
+    </div>
   </div>
 </template>
 
@@ -89,6 +94,12 @@ export default {
       console.log("Fetching all post under topic:", self.topic.name);
       const posts = await fetchPosts(postsQueryWithTopic, self.topic.topicId);
       self.setPosts(posts);
+      // self.forceRefresh = false;
+      // self.$nextTick(() => {
+      //   // Add the component back in
+      //   self.forceRefresh = true;
+      //   self.setRefresh(false);
+      // });
     }
     const user = await currentUser();
     self.setUser(user);
@@ -107,13 +118,13 @@ export default {
     const posts = store.state.posts.posts;
     const refresh = store.state.posts.refresh;
 
-    if (refresh) {   
+    if (refresh) {
       this.forceRefresh = false;
-      this.$nextTick(() => {
+      setTimeout(() => {
         // Add the component back in
         this.forceRefresh = true;
         self.setRefresh(false);
-      });
+      }, 50);
     }
   },
   async onPullDownRefresh() {
@@ -260,10 +271,10 @@ export default {
       });
     },
     handleShowOptionSheet: function(optionPost) {
-      this.optionPost = optionPost
+      this.optionPost = optionPost;
     },
     closeOptionSheet: function() {
-      this.optionPost = null
+      this.optionPost = null;
     }
   }
 };

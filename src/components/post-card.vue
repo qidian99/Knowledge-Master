@@ -83,12 +83,13 @@
       :class="{ active: deleting }"
       v-if="isMyPost && showDelete"
     >删除</div>
-    <div class="b-post-images" v-if="images.length !== 0">
-      <PostImages 
+    <div class="b-post-images" v-if="post.images && post.images.length">
+      <DisplayImages 
+        ref="imgs"
         :showTip="false"
         :showDelete="false"
         :showAdd="false"
-        :initialFileList="images"
+        :files="(post.images || []).map(url => 'https://' + url)"
         :thumbnailStyle="thumbnailStyle"
       />
     </div>
@@ -99,6 +100,7 @@
 <script>
 import { presetPrimaryColors, grey } from "@ant-design/colors";
 import { likeAPost } from "../utils/post";
+import DisplayImages from "../components/display-images";
 import PostImages from "../components/post-images";
 import moment from "moment";
 import { mapGetters, mapState, mapActions } from "vuex";
@@ -106,6 +108,7 @@ import { mapGetters, mapState, mapActions } from "vuex";
 // console.log("grey", presetPrimaryColors);
 export default {
   components: {
+    DisplayImages,
     PostImages
   },
   props: {
@@ -145,13 +148,26 @@ export default {
       clickuser: false,
       expanded: false,
       hoverOption: false,
-      images: (this.post.images || []).map(url => "https://" + url)
     };
   },
   onLoad: function() {
     console.log("Post card loaded with props: ", this.post);
     this.likeArray = this.post.likes;
   },
+  updated: function() {
+    // const self = this
+    // self.$nextTick(function () {
+    //   if (self.images.length !== 0 && self.$refs.imgs.setFiles) {
+    //     self.$refs.imgs.setFiles(self.images);
+    //   }
+    // })
+  },
+  mounted: function() {
+    // if (this.images.length !== 0 && this.$refs.imgs.setFiles) {
+    //   this.$refs.imgs.setFiles(this.images);
+    // }
+  },
+  // onUpdated
   computed: {
     ...mapGetters("auth", {
       userObj: "user"
