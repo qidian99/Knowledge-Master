@@ -35,7 +35,7 @@
       </div>
     </div>
     <div class="b-posts-images">
-      <PostImages @upLoadSuccess="onFileUploaded" @uploadDelete="onFileDeleted" />
+      <PostImages ref="imgs" @upLoadSuccess="onFileUploaded" @uploadDelete="onFileDeleted" :initialFileList="files" />
     </div>
     <div class="err-message" v-if="showErr">{{errMsg}}</div>
     <div class="weui-btn-area">
@@ -192,6 +192,8 @@ export default {
 
                       self.body = "";
                       self.title = "";
+                      self.files = [];
+                      self.$refs.imgs.clearFiles();
 
                       wx.navigateBack();
                     }
@@ -212,6 +214,8 @@ export default {
 
           self.body = "";
           self.title = "";
+          self.files = [];
+          self.$refs.imgs.clearFiles();
 
           wx.navigateBack();
         }
