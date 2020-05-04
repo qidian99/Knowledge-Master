@@ -1,4 +1,9 @@
 import Vue from 'vue'
+import VueApollo from 'vue-apollo'
+import ApolloClient from 'apollo-boost'
+import { HttpLink } from "apollo-link-http";
+import { InMemoryCache } from "apollo-cache-inmemory";
+import 'cross-fetch/polyfill';
 
 import 'mpvue-weui/src/style/weui.css'
 import App from './App'
@@ -6,6 +11,40 @@ import WXrequest from './utils/request'
 import store from './store'
 
 Vue.config.productionTip = false
+Vue.use(VueApollo)
+
+// const getHeaders = () => {
+//   const headers = {};
+//    const token = store.state.auth.token;
+//    if (token) {
+//      headers.authorization = `Bearer ${token}`;
+//    }
+//    return headers;
+//  };
+//  // Create an http link:
+//  const link = new HttpLink({
+//    uri: process.env.API_BASE_URL,
+//    fetch,
+//    headers: getHeaders()
+//  });
+//  const client = new ApolloClient({
+//    link: link,
+//    cache: new InMemoryCache({
+//      addTypename: true
+//    })
+//  });
+
+const client = new ApolloClient({
+  uri: process.env.API_BASE_URL,
+});
+
+
+const apolloProvider = new VueApollo({
+  defaultClient: apolloClient,
+  defaultOptions: {
+    $loadingKey: "loading"
+  }
+})
 Vue.prototype.$http = WXrequest
 Vue.prototype.$store = store
 // Vue.loadScript('/js/cos-js-sdk-v5.min.js') // no loader
