@@ -1,5 +1,4 @@
 import { SET_VIEW_OTHER_USER } from '../mutation-types'
-
 // initial state
 const initialState = {
   otherUser: {}

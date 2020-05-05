@@ -22,7 +22,7 @@ import { UPDATE_USER_INFO } from "@/store/mutation-types";
 import SettingOption from "@/components/setting-option";
 import UserGallery from "@/components/user-gallery";
 import { updateUserProfile } from "../../utils/user";
-import { fetchPosts } from "../../utils/post";
+import { fetchPosts } from "../../client/post";
 import { registerQuery, postsQueryWithTopic } from "../../utils/queries";
 
 export default {

@@ -23,7 +23,6 @@ import { likeAPost } from "../utils/post";
 import moment from "moment";
 import { mapGetters, mapState, mapActions } from "vuex";
 
-// console.log("grey", presetPrimaryColors);
 export default {
   props: {
     post: {

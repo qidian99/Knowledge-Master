@@ -12,8 +12,8 @@ import { topicsQuery } from "../../utils/queries";
 import { blue } from "@ant-design/colors";
 import { mapGetters, mapState, mapActions } from "vuex";
 import { SET_USER_TOPIC, SET_USER_POST } from "../../store/mutation-types";
-import { fetchPosts } from "../../utils/post";
-import { subscribeToTopic } from "../../utils/user";
+import { fetchPosts } from "../../client/post";
+import { subscribeToTopic } from "../../client/user";
 import { postsQueryWithTopic } from "../../utils/queries";
 
 export default {

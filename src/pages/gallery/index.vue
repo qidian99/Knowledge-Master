@@ -20,12 +20,12 @@
 import HistoryCard from "@/components/history-card";
 import Uploader from "@/components/uploader";
 import { createPostMutation } from "../../utils/queries";
-import { sendTemplateMessage } from "../../utils/post";
+import { sendTemplateMessage } from "../../client/post";
 import {
   addToGallery,
   deleteFromGallery,
   deleteGallery
-} from "../../utils/gallery";
+} from "../../client/gallery";
 import { blue } from "@ant-design/colors";
 import { mapGetters, mapState, mapActions } from "vuex";
 import {
@@ -71,7 +71,7 @@ export default {
           Key: "km/" + filename,
           FilePath: filePath,
           onProgress: function(info) {
-            console.log("on progress", JSON.stringify(info));
+            // console.log("on progress", JSON.stringify(info));
           }
         },
         async function(err, data) {

@@ -1,27 +1,25 @@
-import http from './request'
+import apolloClient from './index'
 import {
   deleteFromGalleryMutation,
   addToGalleryMutation,
   deleteGalleryMutation
-} from './queries'
+} from './graphql'
 
 
 export async function addToGallery (filepath) {
-  const payload = {
+  const operation = {
     query: addToGalleryMutation,
     variables: {
       filepath
     }
   }
-  const r = await http.post({
-    payload
-  })
+  const res = await apolloClient.query(operation)
 
   const {
     data: {
       addToGallery
     }
-  } = r
+  } = res
 
   console.log('Fetched gallery', addToGallery)
   return addToGallery
@@ -29,21 +27,19 @@ export async function addToGallery (filepath) {
 
 
 export async function deleteFromGallery (filepath) {
-  const payload = {
+  const operation = {
     query: deleteFromGalleryMutation,
     variables: {
       filepath
     }
   }
-  const r = await http.post({
-    payload
-  })
+  const res = await apolloClient.query(operation)
 
   const {
     data: {
       deleteFromGallery
     }
-  } = r
+  } = res
 
   console.log('Deleted gallery', deleteFromGallery)
   return deleteFromGallery
@@ -52,18 +48,16 @@ export async function deleteFromGallery (filepath) {
 
 
 export async function deleteGallery (filepath) {
-  const payload = {
+  const operation = {
     query: deleteGalleryMutation
   }
-  const r = await http.post({
-    payload
-  })
+  const res = await apolloClient.query(operation)
 
   const {
     data: {
       deleteGallery
     }
-  } = r
+  } = res
 
   console.log('Deleted gallery', deleteGallery)
   return deleteGallery

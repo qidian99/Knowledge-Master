@@ -19,7 +19,6 @@
 
 <script>
 import { presetPrimaryColors, grey } from "@ant-design/colors";
-console.log("grey", presetPrimaryColors);
 export default {
   props: {
     optionPost: {

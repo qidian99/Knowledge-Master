@@ -1,5 +1,5 @@
 import store from '../store'
-import { deletePost } from './post'
+import { deletePost } from '../client/post'
 
 const removePost = (post) => {
   store.dispatch('removePost', post)

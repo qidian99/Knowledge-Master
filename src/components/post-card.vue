@@ -99,13 +99,12 @@
 
 <script>
 import { presetPrimaryColors, grey } from "@ant-design/colors";
-import { likeAPost } from "../utils/post";
+import { likeAPost } from "../client/post";
 import DisplayImages from "../components/display-images";
 import PostImages from "../components/post-images";
 import moment from "moment";
 import { mapGetters, mapState, mapActions } from "vuex";
 
-// console.log("grey", presetPrimaryColors);
 export default {
   components: {
     DisplayImages,
@@ -151,7 +150,7 @@ export default {
     };
   },
   onLoad: function() {
-    console.log("Post card loaded with props: ", this.post);
+    // console.log("Post card loaded with props: ", this.post);
     this.likeArray = this.post.likes;
   },
   updated: function() {
@@ -231,7 +230,7 @@ export default {
       return index !== -1;
     },
     isMyPost: function() {
-      return this.post.user.userId === this.userObj.userId;
+      return (this.post.user) ? (this.post.user.userId === this.userObj.userId) : false;
     }
   },
   methods: {

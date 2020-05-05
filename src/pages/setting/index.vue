@@ -38,8 +38,8 @@ import WXAuthorize from "@/components/wx-authorize";
 import { mapGetters, mapState, mapActions } from "vuex";
 import { UPDATE_USER_INFO } from "@/store/mutation-types";
 import SettingOption from "@/components/setting-option";
-import { updateUserProfile } from "../../utils/user";
-import { fetchPosts } from "../../utils/post";
+import { updateUserProfile, registerOpenid } from "../../client/user";
+import { fetchPosts } from "../../client/post";
 import { registerQuery, postsQueryWithTopic } from "../../utils/queries";
 
 export default {
@@ -109,7 +109,7 @@ export default {
             if (res.code) {
               // send code to backend
               console.log("Code", res.code);
-              self.registerOpenid(res.code);
+              registerOpenid(res.code);
             }
           }
         });
@@ -144,40 +144,6 @@ export default {
         }
       });
     },
-    async registerOpenid(code) {
-      const self = this;
-      const payload = {
-        query: registerQuery,
-        variables: {
-          code
-        }
-      };
-      const r = await self.$http.post({
-        payload
-      });
-
-      const {
-        data: {
-          registerOpenid: { user, token }
-        }
-      } = r;
-
-      console.log("Registered, token is:", token, user);
-
-      // set auth token
-      self.setAuthToken({ token, user });
-
-      if (user.subscription) {
-        // set subscription
-        self.setUserTopic(user.subscription);
-        wx.setNavigationBarTitle({
-          title: user.subscription.name
-        });
-        console.log("Fetching all post under topic:", self.topic.name);
-        const posts = await fetchPosts(postsQueryWithTopic, self.topic.topicId);
-        self.setPosts(posts);
-      }
-    }
   }
 };
 </script>

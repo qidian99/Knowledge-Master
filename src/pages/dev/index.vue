@@ -12,7 +12,7 @@
       <div v-for="(item, index) in users" :key="index">{{item.username}}</div>
     </div>
     <div class="uploader">
-      测试 Apollo Subscription (websocket)
+      测试 Apollo Subscription (Web Socket)
       <div v-if="post">
         <div>新帖ID：{{post.postId}}</div>
         <div>新帖标题：{{post.title}}</div>
@@ -27,29 +27,20 @@
 import HistoryCard from "@/components/history-card";
 import Uploader from "@/components/uploader";
 import { createPostMutation } from "../../utils/queries";
-import { sendTemplateMessage } from "../../utils/post";
+import { sendTemplateMessage } from "../../client/post";
 import {
   addToGallery,
   deleteFromGallery,
   deleteGallery
-} from "../../utils/gallery";
+} from "../../client/gallery";
 import { blue } from "@ant-design/colors";
 import { mapGetters, mapState, mapActions } from "vuex";
 import { cos, Bucket, Region } from "../../utils/cos";
 
-import fetch from "@/adapter/fetch";
-import websocket from "@/adapter/websocket";
-
-import { execute, makePromise } from "apollo-link";
+import apolloClient from "../../client";
 import { HttpLink } from "apollo-link-http";
-import gql from "graphql-tag";
 import store from "../../store";
-
-const uri = process.env.API_BASE_URL;
-const link = new HttpLink({
-  uri,
-  fetch
-});
+import gql from "graphql-tag";
 
 const operation = {
   query: gql`
@@ -68,19 +59,6 @@ const operation = {
   // context: {} // optional
   // extensions: {} // optional
 };
-
-import { SubscriptionClient } from "subscriptions-transport-ws";
-
-const client = new SubscriptionClient(
-  process.env.SUBSCRIPTION_BASE_URL,
-  {
-    reconnect: true,
-    connectionParams: {
-      token: store.state.auth.token
-    }
-  },
-  websocket
-);
 
 const subOp = {
   query: gql`
@@ -110,19 +88,15 @@ export default {
   },
   async mounted() {
     const self = this;
-    makePromise(execute(link, operation)).then(({ data }) => {
+    apolloClient.query(operation).then(({ data }) => {
       self.users = data.users;
-      console.log("Data fetch from graphql serer", data);
+      console.log("Data fetch from graphql server", data);
     });
 
-    client.request(subOp).subscribe({
-      next: ({ data }) => {
-        const { postId, title, body } = data.postAdded;
-        self.post = { postId, title, body };
-        console.log('New data!', data)
-      },
-      error: error => error,
-      complete: () => {}
+    apolloClient.subscribe(subOp, ({ data }) => {
+      const { postId, title, body } = data.postAdded;
+      self.post = { postId, title, body };
+      console.log("New data!", data);
     });
   },
   computed: {

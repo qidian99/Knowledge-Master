@@ -24,7 +24,7 @@ import {
   registerQuery,
   postsQueryWithoutTopic,
   postsQueryWithTopic
-} from "../../utils/queries";
+} from "../../client/graphql";
 import {
   findUserPosts,
   createComment,
@@ -33,8 +33,9 @@ import {
   fetchPost,
   deletePost,
   clickPostAndNavigate
-} from "../../utils/post";
-import { currentUser, handleViewUser, registerOpenid } from "../../utils/user";
+} from "../../client/post";
+import { currentUser, registerOpenid } from "../../client/user";
+import { handleViewUser } from "../../utils/user";
 import {
   handleDelete,
   handleShowOptionSheet,

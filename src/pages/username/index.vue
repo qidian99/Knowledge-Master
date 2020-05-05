@@ -26,7 +26,7 @@
 <script>
 import TopicCard from "@/components/topic-card";
 import { createPostMutation } from "../../utils/queries";
-import { createPost, setUsername } from "../../utils/post";
+import { createPost, setUsername } from "../../client/post";
 import { blue } from "@ant-design/colors";
 import { mapGetters, mapState, mapActions } from "vuex";
 

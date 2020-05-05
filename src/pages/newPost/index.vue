@@ -54,7 +54,7 @@
 import TopicCard from "@/components/topic-card";
 import PostImages from "@/components/post-images";
 import { createPostMutation } from "../../utils/queries";
-import { createPost } from "../../utils/post";
+import { createPost } from "../../client/post";
 import { blue } from "@ant-design/colors";
 import { mapGetters, mapState, mapActions } from "vuex";
 import { cos, Bucket, Region } from "../../utils/cos";
@@ -165,7 +165,7 @@ export default {
                   Key: "km/" + filename,
                   FilePath: file,
                   onProgress: function(info) {
-                    console.log("on progress", JSON.stringify(info));
+                    // console.log("on progress", JSON.stringify(info));
                   }
                 },
                 async function(err, data) {

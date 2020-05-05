@@ -74,8 +74,9 @@ import {
   fetchPost,
   deletePost,
   clickPostAndNavigate
-} from "../../utils/post";
-import { currentUser, handleViewUser, registerOpenid } from "../../utils/user";
+} from "../../client/post";
+import { currentUser, registerOpenid } from "../../client/user";
+import { handleViewUser } from "../../utils/user";
 import {
   handleDelete,
   handleShowOptionSheet,
@@ -86,7 +87,6 @@ import CommentCard from "@/components/comment-card";
 import PostCard from "@/components/post-card";
 import OptionSheet from "@/components/option-sheet";
 import moment from "moment";
-console.log("grey", presetPrimaryColors);
 export default {
   components: { CommentCard, PostCard, OptionSheet },
   data() {

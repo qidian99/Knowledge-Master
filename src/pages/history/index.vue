@@ -14,7 +14,7 @@
 <script>
 import HistoryCard from "@/components/history-card";
 import { createPostMutation } from "../../utils/queries";
-import { createPost, setUsername, fetchPost, clickPostAndNavigate } from "../../utils/post";
+import { createPost, setUsername, fetchPost, clickPostAndNavigate } from "../../client/post";
 import { blue } from "@ant-design/colors";
 import { mapGetters, mapState, mapActions } from "vuex";
 
