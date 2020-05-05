@@ -6,13 +6,18 @@
     <div class="btn">
       <button @click="handleSendMessage">测试一次性评论</button>
     </div>
+    <div class="uploader">用户画廊已加入设置</div>
     <div class="uploader">
-      用户画廊已加入设置
-      <!-- <Uploader
-        @upLoadSuccess="onFileUploaded"
-        @uploadDelete="onFileDeleted"
-        :initialFileList="gallery"
-      /> -->
+      测试 Apollo HTTP Link
+      <div v-for="(item, index) in users" :key="index">{{item.username}}</div>
+    </div>
+    <div class="uploader">
+      测试 Apollo Subscription (websocket)
+      <div v-if="post">
+        <div>新帖ID：{{post.postId}}</div>
+        <div>新帖标题：{{post.title}}</div>
+        <div>新帖内容：{{post.body}}</div>
+      </div>
     </div>
   </div>
 </template>
@@ -30,29 +35,96 @@ import {
 } from "../../utils/gallery";
 import { blue } from "@ant-design/colors";
 import { mapGetters, mapState, mapActions } from "vuex";
-import {
-    cos,
-    Bucket,
-    Region
-} from '../../utils/cos'
+import { cos, Bucket, Region } from "../../utils/cos";
 
+import fetch from "@/adapter/fetch";
+import websocket from "@/adapter/websocket";
+
+import { execute, makePromise } from "apollo-link";
+import { HttpLink } from "apollo-link-http";
+import gql from "graphql-tag";
+import store from "../../store";
+
+const uri = process.env.API_BASE_URL;
+const link = new HttpLink({
+  uri,
+  fetch
+});
+
+const operation = {
+  query: gql`
+    query users {
+      users {
+        userId
+        username
+        nickName
+        avatarUrl
+        sessionKey
+      }
+    }
+  `,
+  variables: {} // optional
+  // operationName: {} // optional
+  // context: {} // optional
+  // extensions: {} // optional
+};
+
+import { SubscriptionClient } from "subscriptions-transport-ws";
+
+const client = new SubscriptionClient(
+  process.env.SUBSCRIPTION_BASE_URL,
+  {
+    reconnect: true,
+    connectionParams: {
+      token: store.state.auth.token
+    }
+  },
+  websocket
+);
+
+const subOp = {
+  query: gql`
+    subscription {
+      postAdded {
+        postId
+        title
+        body
+      }
+    }
+  `
+};
 
 export default {
   components: { HistoryCard, Uploader },
-  // data() {
-  //   return {
-  //     gallery: ["km-1256664426.cos.ap-beijing.myqcloud.com/km/wx38d854d0c185f949.o6zAJs3u9GA6D09AxYC78hOR---s.A9b4nMJb1arAa909d0bd013539a49bc8e8bc4f84effb.png",
-  //     "km-1256664426.cos.ap-beijing.myqcloud.com/km/wx38d854d0c185f949.o6zAJs3u9GA6D09AxYC78hOR---s.YwsLgY0bqKF54023049ccba0c037bf2dbd4aba5e8766.png",
-  //     "km-1256664426.cos.ap-beijing.myqcloud.com/km/wx38d854d0c185f949.o6zAJs3u9GA6D09AxYC78hOR---s.Ms345l1dsPlH095c19631a454d442e9c042ab70adbcb.png"].map(url => 'https://' + url),
-  //   };
-  // },
+  data() {
+    return {
+      users: [Object],
+      post: Object
+    };
+  },
   onLoad(query) {
     wx.setNavigationBarTitle({
       title: "内测功能"
     });
     console.log("QUERY", query.postId);
   },
-  async mounted() {},
+  async mounted() {
+    const self = this;
+    makePromise(execute(link, operation)).then(({ data }) => {
+      self.users = data.users;
+      console.log("Data fetch from graphql serer", data);
+    });
+
+    client.request(subOp).subscribe({
+      next: ({ data }) => {
+        const { postId, title, body } = data.postAdded;
+        self.post = { postId, title, body };
+        console.log('New data!', data)
+      },
+      error: error => error,
+      complete: () => {}
+    });
+  },
   computed: {
     ...mapGetters("post", {
       posts: "history"
@@ -113,66 +185,16 @@ export default {
         });
       } catch (err) {
         console.log("评论发送失败");
-          wx.showModal({
-            title: "评论发送失败",
-            showCancel: false,
-            success(res) {
-              if (res.confirm) {
-              } else if (res.cancel) {
-              }
+        wx.showModal({
+          title: "评论发送失败",
+          showCancel: false,
+          success(res) {
+            if (res.confirm) {
+            } else if (res.cancel) {
             }
-          });
+          }
+        });
       }
-    },
-    async onFileUploaded(res) {
-      const self = this;
-      console.log("on File Upload:", res);
-
-      var filePath = res[0];
-      var filename = filePath.substr(filePath.lastIndexOf("/") + 1);
-      cos.postObject(
-        {
-          Bucket: Bucket,
-          Region: Region,
-          Key: "km/" + filename,
-          FilePath: filePath,
-          onProgress: function(info) {
-            console.log("on progress", JSON.stringify(info));
-          }
-        },
-        async function(err, data) {
-          console.log("data or err", err || data);
-          if (!err && data) {
-            const gallery = await addToGallery(data.Location);
-            self.gallery = gallery;
-            self.setUserGallery(gallery);
-            console.log("GALLERY", gallery);
-          }
-        }
-      );
-    },
-    deleteGallery(filename) {
-      const self = this;
-      cos.deleteObject(
-        {
-          Bucket: Bucket /* 必须 */,
-          Region: Region /* 存储桶所在地域，必须字段 */,
-          Key: filename /* 必须 */
-        },
-        async function(err, data) {
-          console.log(err || data);
-          // const filepath = filename.substr(filename.indexOf("/") + 2)
-          const gallery = await deleteFromGallery(
-            `${Bucket}.cos.${Region}.myqcloud.com/` + filename
-          );
-          self.setUserGallery(gallery);
-        }
-      );
-    },
-    onFileDeleted(filePath) {
-      console.log("obj", filePath);
-      var filename = filePath.substr(filePath.lastIndexOf("/") + 1);
-      this.deleteGallery("km/" + filename);
     }
   }
 };
