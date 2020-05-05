@@ -35,9 +35,9 @@
       </div>
     </div>
     <div class="b-posts-images">
-      <PostImages 
-        @upLoadSuccess="onFileUploaded" 
-        @uploadDelete="onFileDeleted" 
+      <PostImages
+        @upLoadSuccess="onFileUploaded"
+        @uploadDelete="onFileDeleted"
         :initialFileList="images"
         ref="imgs"
       />
@@ -68,6 +68,8 @@ export default {
   components: { PostImages },
   data() {
     return {
+      body: "dd",
+      title: "d",
       showErr: false,
       BODY_LIMIT,
       files: [],
@@ -81,9 +83,13 @@ export default {
     });
   },
   async mounted() {
-    console.log('Edit page mounted', this.post)
+    console.log("Edit page mounted", this.post);
     this.$refs.imgs.setFiles(this.images);
-    self.uploading = false;
+    this.uploading = false;
+    // console.log('TITLE Edit page mounted', this.oldTitle)
+    this.title = this.oldTitle;
+    // console.log("BODY Edit page mounted", this.oldBody);
+    this.body = this.oldBody;
   },
   computed: {
     ...mapState({
@@ -98,14 +104,14 @@ export default {
     ...mapGetters("posts", {
       posts: "posts"
     }),
-    title: function () {
-      return this.post.title || ""
+    oldTitle: function() {
+      return this.post.title || "";
     },
-    body: function () {
-      return this.post.body || ""
+    oldBody: function() {
+      return this.post.body || "";
     },
-    images: function () {
-      return (this.post.images || []).map(url => 'https://' + url)
+    images: function() {
+      return (this.post.images || []).map(url => "https://" + url);
     },
     submitStyle: function() {
       return "background-color:" + blue.primary;
@@ -144,7 +150,7 @@ export default {
       updatePost: "updatePost"
     }),
     ...mapActions("edit", {
-      editPost: "editPost",
+      editPost: "editPost"
     }),
     handleBodyInput: function(e) {
       this.showErr = false;
@@ -180,7 +186,7 @@ export default {
 
           await Promise.all(
             self.files.map(async (file, index) => {
-              if (file.startsWith('https')) {
+              if (file.startsWith("https")) {
                 fileArray[index] = file.substr(file.indexOf("/") + 2);
                 finished += 1;
                 if (finished === fileArray.length) {
@@ -190,14 +196,14 @@ export default {
                     self.body,
                     fileArray
                   );
-                  console.log('Edited', post);
-                  self.updatePost({ newPost: post, post: self.post })
-                  self.editPost({})
+                  console.log("Edited", post);
+                  self.updatePost({ newPost: post, post: self.post });
+                  self.editPost({});
                   self.$refs.imgs.clearFiles();
                   self.uploading = false;
                   wx.navigateBack();
                 }
-                return
+                return;
               }
               var filename = file.substr(file.lastIndexOf("/") + 1);
               cos.postObject(
@@ -229,9 +235,9 @@ export default {
                         self.body,
                         fileArray
                       );
-                      console.log('Edited', post);
-                      self.updatePost({ newPost: post, post: self.post })
-                      self.editPost({})
+                      console.log("Edited", post);
+                      self.updatePost({ newPost: post, post: self.post });
+                      self.editPost({});
                       self.$refs.imgs.clearFiles();
                       self.uploading = false;
                       wx.navigateBack();
@@ -242,15 +248,15 @@ export default {
             })
           );
         } else {
-           const post = await editPost(
+          const post = await editPost(
             self.post.postId,
             self.title,
             self.body,
             self.post.images.length === 0 ? null : []
           );
-          console.log('Edited', self.files, post);
-          self.updatePost({ newPost: post, post: self.post })
-          self.editPost({})
+          console.log("Edited", self.files, post);
+          self.updatePost({ newPost: post, post: self.post });
+          self.editPost({});
           self.$refs.imgs.clearFiles();
           self.uploading = false;
           wx.navigateBack();
