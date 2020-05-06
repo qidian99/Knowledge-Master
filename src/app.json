@@ -12,7 +12,8 @@
     "pages/dev/main",
     "pages/user/main",
     "pages/myposts/main",
-    "pages/gallery/main"
+    "pages/gallery/main",
+    "pages/chat/main"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -31,6 +32,11 @@
       "pagePath": "pages/index/main",
       "iconPath": "static/tabs/home.png",
       "selectedIconPath": "static/tabs/home-active.png"
+    }, {
+      "text": "聊天",
+      "pagePath": "pages/chat/main",
+      "iconPath": "static/tabs/message.png",
+      "selectedIconPath": "static/tabs/message-active.png"
     }, {
       "text": "内测",
       "pagePath": "pages/dev/main",

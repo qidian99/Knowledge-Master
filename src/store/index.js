@@ -8,6 +8,7 @@ import user from './modules/user' // view other users
 import posts from './modules/posts' // posts under topics
 import post from './modules/post' // post related to user's browsing history
 import option from './modules/option'
+import chat from './modules/chat'
 import createLogger from '../plugins/logger'
 import createPersistedState from 'vuex-persistedstate'
 import { REMOVE_COMMENT, REMOVE_POST } from './mutation-types'
@@ -25,6 +26,7 @@ export default new Vuex.Store({
     user,
     edit,
     option,
+    chat,
   },
   strict: debug,
   // plugins: debug ? [createLogger()] : []
@@ -49,6 +51,7 @@ export default new Vuex.Store({
       commit('user/reset')
       commit('edit/reset')
       commit('option/reset')
+      commit('chat/reset')
     },
     removeComment ({ commit, state }, { post, comment }) {
       commit(`posts/${REMOVE_COMMENT}`, { post, comment })

@@ -60,6 +60,9 @@ import {
   deletePost,
   clickPostAndNavigate
 } from "../../client/post";
+import {
+  subscribeToNewMessage
+} from "../../client/message";
 import { currentUser, registerOpenid } from "../../client/user";
 import { handleViewUser } from "../../utils/user";
 
@@ -89,6 +92,7 @@ export default {
     };
   },
   async created() {
+    subscribeToNewMessage();
     self = this;
     if (!self.token) {
       wx.login({
@@ -97,7 +101,7 @@ export default {
           if (res.code) {
             // send code to backend
             console.log("Code", res.code);
-            self.registerOpenid(res.code);
+            registerOpenid(res.code);
           }
         }
       });

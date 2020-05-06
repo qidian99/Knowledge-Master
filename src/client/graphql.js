@@ -213,3 +213,101 @@ query currentUser {
   }
 }
 `
+
+
+const RoomFragment = `
+roomId
+chatterOne  {
+  ...on User {
+    ${UserFragment}
+  }
+}
+chatterTwo  {
+  ...on User {
+    ${UserFragment}
+  }
+}
+message {
+  messageId
+  content
+  sender {
+    ...on User {
+      ${UserFragment}
+    }
+  }
+  receiver  {
+    ...on User {
+      ${UserFragment}
+    }
+  }
+  content
+  createdAt
+}
+`
+
+const MessageFragment = `
+messageId
+content
+sender {
+  ...on User {
+    ${UserFragment}
+  }
+}
+receiver  {
+  ...on User {
+    ${UserFragment}
+  }
+}
+content
+createdAt
+room {
+  roomId
+  chatterOne  {
+    ...on User {
+      ${UserFragment}
+    }
+  }
+  chatterTwo  {
+    ...on User {
+      ${UserFragment}
+    }
+  }
+}
+`
+
+export const sendMessageMutation = gql`
+ mutation sendMessage($receiverId: ID! $content: String!) {
+   newMessage(receiverId: $receiverId content: $content) {
+     ${MessageFragment}
+   }
+ }`
+
+export const messagesQuery = gql`
+ query messages($chatterId: ID!) {
+   messages(chatterId: $chatterId) {
+    ${MessageFragment}
+   }
+ }`
+
+export const messageListQuery = gql`
+ query messageList {
+   messageList {
+     ${RoomFragment}
+   }
+ }`
+
+
+export const newMessageSubscription = gql`
+subscription onNewMessage {
+  newMessage {
+    ${MessageFragment}
+  }
+}`
+
+export const newPostSubscription = gql`
+subscription {
+  postAdded {
+    ${PostFragment}
+  }
+}
+`

@@ -1,5 +1,6 @@
 import { updateUserProfileMutation, subscribeToTopicMutation, currentUserQuery, registerQuery, postsQueryWithTopic } from './graphql'
 import store from '../store'
+import { subscribeToNewMessage } from './message'
 import { fetchPosts } from './post'
 import apolloClient from './index'
 import {
@@ -71,9 +72,11 @@ export const registerOpenid = async function (code) {
       registerOpenid: { user, token }
     }
   } = res;
-  console.log("Registered, token is:", token, user);
+  console.log("[Apollo]Registered, token is:", token, user);
   // set auth token
   setAuthToken({ token, user });
+
+  // fetch posts
   if (user.subscription) {
     // set subscription
     setUserTopic(user.subscription);
@@ -84,4 +87,10 @@ export const registerOpenid = async function (code) {
     const posts = await fetchPosts(postsQueryWithTopic, user.subscription.topicId);
     setPosts(posts);
   }
+
+  // init subscription client in apollo
+  apolloClient.initSubscriptionClient();
+
+  // subscribe to new messages
+  subscribeToNewMessage();
 }

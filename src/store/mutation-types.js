@@ -33,9 +33,13 @@ export const SET_VIEW_OTHER_USER = 'SET_VIEW_OTHER_USER'
 // for edit
 export const SET_EDIT_POST = 'SET_EDIT_POST'
 
-
 // for option 
 export const SET_OPTION_POST = 'SET_OPTION_POST'
+
+// for rooms
+export const SET_ROOMS = 'SET_ROOMS'
+export const ADD_MESSAGE = 'ADD_MESSAGE'
+export const READ_MESSAGE = 'READ_MESSAGE'
 
 
 // for other page
