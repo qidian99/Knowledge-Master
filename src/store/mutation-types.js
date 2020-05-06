@@ -40,6 +40,8 @@ export const SET_OPTION_POST = 'SET_OPTION_POST'
 export const SET_ROOMS = 'SET_ROOMS'
 export const ADD_MESSAGE = 'ADD_MESSAGE'
 export const READ_MESSAGE = 'READ_MESSAGE'
+export const SET_CHATTER_ID = 'SET_CHATTER_ID'
+export const SET_MESSAGES = 'SET_MESSAGES'
 
 
 // for other page

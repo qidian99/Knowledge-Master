@@ -12,6 +12,9 @@
     <div class="setting-option-divider" />
     <SettingOption title="ta的画廊" :text="(files.length !== 0) ? '' : '未知'" />
     <UserGallery ref="imgs" :initialFileList="files" />
+    <div class="send-message" v-if="showMessageBox">
+      <button @click="handleSendMessage">发送消息</button>
+    </div>
   </div>
 </template>
 
@@ -54,6 +57,12 @@ export default {
     ...mapState({
       user: state => state.user.otherUser
     }),
+    ...mapState("auth", {
+      me: "user"
+    }),
+    ...mapGetters("chat", {
+      rooms: "rooms"
+    }),
     subscription: function() {
       if (this.user && this.user.subscription && this.user.subscription.name) {
         return this.user.subscription.name;
@@ -69,9 +78,29 @@ export default {
       return ((this.user && this.user.gallery) || []).map(
         url => "https://" + url
       );
+    },
+    showMessageBox: function () {
+      if (!this.me || !this.user) return false
+      return this.me.userId !== this.user.userId
     }
   },
-  methods: {}
+  methods: {
+    ...mapActions("chat", {
+      setCurrentChat: 'setCurrentChat'
+    }),
+    handleSendMessage () {
+      console.log('preparing send message to user', this.user);
+      const chatterId = this.user.userId;
+      const room = this.rooms.find(room => (room.chatterOne.userId === chatterId) || (room.chatterTwo.userId === chatterId))
+      this.setCurrentChat({
+        chatterId,
+        roomId: (room) ? room.roomId : null
+      })
+      wx.navigateTo({
+        url: '/pages/message/main'
+      })
+    }
+  }
 };
 </script>
 
@@ -101,8 +130,10 @@ export default {
   align-items: center;
 }
 
-.clear-storage {
-  margin: 10px, 10px, 0px;
+.send-message {
+  margin: 10px, 20px, 0px;
   padding: 5px 10px;
 }
+
+
 </style>

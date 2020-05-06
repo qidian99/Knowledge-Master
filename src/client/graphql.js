@@ -311,3 +311,11 @@ subscription {
   }
 }
 `
+
+export const userQuery = gql`
+query user($userId: ID!) {
+  user(userId: $userId) {
+    ${UserFragment}
+  }
+}
+`

@@ -51,7 +51,8 @@ export default {
       '^pages/user/main',
       '^pages/myposts/main',
       "^pages/gallery/main",
-      "^pages/chat/main"
+      "^pages/chat/main",
+      "^pages/message/main"
     ],
     window: {
       backgroundTextStyle: 'light',
