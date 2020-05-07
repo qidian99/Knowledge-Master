@@ -24,7 +24,7 @@
             :value="body"
             class
             placeholder="请输入内容"
-            style="height: 3.3em"
+            style="height: 8em"
             @input="handleBodyInput"
           />
           <div
@@ -84,13 +84,18 @@ export default {
   },
   async mounted() {
     console.log("Edit page mounted", this.post);
-    this.$refs.imgs.setFiles(this.images);
     this.uploading = false;
     // console.log('TITLE Edit page mounted', this.oldTitle)
     this.title = this.oldTitle;
     // console.log("BODY Edit page mounted", this.oldBody);
     this.body = this.oldBody;
+    this.$refs.imgs.setFiles(this.images);
+    this.files = this.images;
   },
+  // onShow() {
+  //   console.log('Test images', this.images);
+  //   this.$refs.imgs.setFiles(this.images);
+  // },
   computed: {
     ...mapState({
       topic: state => state.topics.topic

@@ -343,12 +343,14 @@ export default {
 .b-post-card-body {
   grid-area: body;
   color: rgba(0, 0, 0, 0.65);
-  padding: 10px 20px 10px;
+  padding: 0px 20px 0px;
   font-size: 16px;
   font-weight: normal;
   text-align: left;
   word-wrap: break-word;
-  /* border: 10px solid black; */
+  white-space: pre-line;
+  margin-top: -10px;
+  /* border: 1px solid black; */
 }
 
 .post-card-body-expand {
@@ -356,15 +358,6 @@ export default {
   color: #1296db;
   font-size: 14px;
   margin-top: 2px;
-  /* float: left; */
-}
-.post-card-body {
-  /* grid-area: body;
-  color: rgba(0, 0, 0, 0.65);
-  padding: 10px 20px 10px;
-  font-size: 16px;
-  font-weight: normal;
-  text-align: left; */
   /* float: left; */
 }
 

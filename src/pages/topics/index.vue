@@ -8,13 +8,13 @@
 
 <script>
 import TopicCard from "@/components/topic-card";
-import { topicsQuery } from "../../utils/queries";
 import { blue } from "@ant-design/colors";
 import { mapGetters, mapState, mapActions } from "vuex";
 import { SET_USER_TOPIC, SET_USER_POST } from "../../store/mutation-types";
 import { fetchPosts } from "../../client/post";
+import { fetchTopics } from "../../client/topics";
 import { subscribeToTopic } from "../../client/user";
-import { postsQueryWithTopic } from "../../utils/queries";
+import { postsQueryWithTopic } from "../../client/graphql";
 
 export default {
   components: { TopicCard },
@@ -29,23 +29,11 @@ export default {
     });
   },
   async mounted() {
-    self = this;
     console.log("Topics Mounted");
-    const payload = {
-      query: topicsQuery
-    };
-    const r = await self.$http.post({
-      payload
-    });
-
-    const {
-      data: { topics }
-    } = r;
-
-    console.log("Topics Fetched:", topics);
+    const topics = await fetchTopics();
 
     // self.topics = [...this.topics, ...topics] // for testing
-    self.topics = topics;
+    this.topics = topics;
 
     // self.notifyUserInfo(user)
   },

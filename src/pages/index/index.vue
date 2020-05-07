@@ -145,8 +145,8 @@ export default {
   },
   async onPullDownRefresh() {
     console.log("下拉刷新");
-    console.log("Fetching all post under topic:", self.topic.name);
-    const posts = await fetchPosts(postsQueryWithTopic, self.topic.topicId);
+    console.log("Fetching all post under topic:", this.topic.name);
+    const posts = await fetchPosts(postsQueryWithTopic, this.topic.topicId);
     this.setPosts(posts);
     wx.stopPullDownRefresh();
   },

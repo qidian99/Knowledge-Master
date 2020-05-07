@@ -25,9 +25,9 @@
       <div v-for="(message, index) in messages" :key="index">
         <MessageCard :message="message" />
       </div>
-      <!-- <div v-if="tempMessage">
+      <div v-if="tempMessage">
         <MessageCard :message="tempMessage" />
-      </div> -->
+      </div>
     </div>
   </div>
 </template>
@@ -63,12 +63,12 @@ export default {
       user: "user"
     }),
     messages: function() {
-      if (this.currentChat.roomId) {
-        // console.log("messages", this.messagesFn(this.currentChat.roomId));
-        console.log("this.currentChat.roomId", this.currentChat.roomId);
-        return this.allMsg[this.currentChat.roomId];
-      }
-      return [];
+      // if (this.currentChat.roomId) {
+      //   console.log("this.currentChat.roomId", this.currentChat.roomId);
+      //   return this.allMsg[this.currentChat.roomId];
+      // }
+      // return [];
+      return this.currentChat.messages || []
     },
     title: function() {
       if (this.chatter) {
@@ -92,7 +92,9 @@ export default {
       this.setMessages({ roomId, messages });
     }
   },
-  updated() {},
+  // updated() {
+  //   if (this.messages.length !== )
+  // },
   methods: {
     ...mapActions("chat", {
       setRooms: "setRooms",

@@ -1,6 +1,6 @@
 <template>
   <div class="b-user-status">
-    <button open-type="getUserInfo" @getuserinfo="bindGetUserInfo" @click="getUserInfoClick">同步个人信息</button>
+    <button open-type="getUserInfo" @getuserinfo="bindGetUserInfo" @click="getUserInfoClick">同步头像资料</button>
   </div>
 </template>
 

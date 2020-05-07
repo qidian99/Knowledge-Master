@@ -1,6 +1,6 @@
-import { SET_ROOMS, 
-  ADD_MESSAGE, 
-  READ_MESSAGE, 
+import { SET_ROOMS,
+  ADD_MESSAGE,
+  READ_MESSAGE,
   SET_CHATTER_ID,
   SET_MESSAGES
 } from '../mutation-types'
@@ -11,7 +11,7 @@ const initialState = {
   // format: [roomid]: [messages]
   messages: {},
   reads: {},
-  currentChat: {}, // { chatterId, roomId }
+  currentChat: {} // { chatterId, roomId, messages }
 }
 
 // getters
@@ -29,37 +29,37 @@ const getters = {
   currentChat: (state, getters, rootState) => {
     return state.currentChat
   },
-  allMsg:  (state, getters, rootState) => {
+  allMsg: (state, getters, rootState) => {
     return state.messages
-  },
+  }
 }
 
 // actions
 const actions = {
-  setRooms({ commit, state }, rooms) {
+  setRooms ({ commit, state }, rooms) {
     console.log('Setting rooms', rooms)
     commit(SET_ROOMS, rooms)
   },
-  addMessage({ commit, state }, newMsessage) {
+  addMessage ({ commit, state }, newMsessage) {
     commit(ADD_MESSAGE, newMsessage)
   },
-  setMessages({ commit, state }, { roomId, messages }) {
+  setMessages ({ commit, state }, { roomId, messages }) {
     commit(SET_MESSAGES, { roomId, messages })
   },
-  setReadMessage({ commit, state }, roomId) {
+  setReadMessage ({ commit, state }, roomId) {
     commit(READ_MESSAGE, roomId)
   },
-  setCurrentChat({ commit, state }, { chatterId, roomId }) {
+  setCurrentChat ({ commit, state }, { chatterId, roomId }) {
     commit(SET_CHATTER_ID, { chatterId, roomId })
-  },
+  }
 }
 
 // mutations
 const mutations = {
-  async [SET_ROOMS](state, rooms) {
-    state.rooms = rooms
+  async [SET_ROOMS] (state, rooms) {
+    state.rooms = rooms || []
   },
-  async [ADD_MESSAGE](state, newMessage) {
+  async [ADD_MESSAGE] (state, newMessage) {
     console.log('Adding new message', newMessage)
     const {
       room: {
@@ -71,9 +71,12 @@ const mutations = {
     if (!state.messages[roomId]) {
       state.messages[roomId] = []
     }
+    // if (state.currentChat.roomId === roomId) {
+    //   state.currentChat.messages.unshift(newMessage)
+    // }
     state.messages[roomId].unshift(newMessage)
     console.log('state.newMessage', state.messages)
-    const index = state.rooms.findIndex(room => room.roomId === roomId);
+    const index = state.rooms.findIndex(room => room.roomId === roomId)
     console.log('state.rooms index', index)
     if (index !== -1) {
       console.log('Prioritizing rooms', state.rooms)
@@ -82,25 +85,34 @@ const mutations = {
       state.rooms.splice(index, 1)
       state.rooms.unshift(tempRoom)
     } else {
-      const tempRoom = newMessage.room;
-      tempRoom.message = rest;
+      const tempRoom = newMessage.room
+      tempRoom.message = rest
       console.log('state.rooms before', state.rooms)
       state.rooms.unshift(tempRoom)
       console.log('state.rooms after', state.rooms)
     }
-    state.reads[roomId] = false;
+    state.reads[roomId] = false
     console.log('state.rooms', state.rooms, state.reads)
   },
-  async [READ_MESSAGE](state, roomId) {
-    state.reads[roomId] = true;
+  async [READ_MESSAGE] (state, roomId) {
+    state.reads[roomId] = true
   },
-  async [SET_CHATTER_ID](state, { chatterId, roomId }) {
-    state.currentChat = { chatterId, roomId };
+  async [SET_CHATTER_ID] (state, { chatterId, roomId }) {
+    const obj = { chatterId, roomId }
+    if (roomId) {
+      obj.messages = state.messages[roomId] || []
+    } else {
+      obj.messages = []
+    }
+    state.currentChat = obj
   },
-  async [SET_MESSAGES](state, { roomId, messages }) {
-    state.messages[roomId] = messages;
+  async [SET_MESSAGES] (state, { roomId, messages }) {
+    state.messages[roomId] = messages
+    if (state.currentChat.roomId === roomId) {
+      state.currentChat.messages = messages
+    }
   },
-  reset(state) {
+  reset (state) {
     console.log('chat reset')
     state.rooms = initialState.rooms
     state.messages = initialState.messages

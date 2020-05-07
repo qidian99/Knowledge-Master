@@ -16,7 +16,7 @@ import {
 import {
   removePost,
   updatePost,
-  viewPost,
+  viewPost
 } from '../utils/post'
 
 export async function fetchPosts (query, topicId = null) {

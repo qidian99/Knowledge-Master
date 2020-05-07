@@ -24,7 +24,7 @@
             :value="body"
             class
             placeholder="请输入内容"
-            style="height: 3.3em"
+            style="height: 8em"
             @input="handleBodyInput"
           />
           <div

@@ -25,7 +25,7 @@
     </navigator>
     <WXAuthorize @clickAuthorize="handleClick" />
     <div class="clear-storage">
-      <button @click="handleClear">清空本地缓存</button>
+      <button @click="handleClear">重新获取授权</button>
     </div>
     <!-- <modal title="清空本地缓存" confirm-text="确定" cancel-text="取消" :hidden="modalHidden" @confirm="modalConfirm" @cancel="modalCancel">
       本地历史，帖子将被删除。
